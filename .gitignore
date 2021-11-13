@@ -2,4 +2,5 @@
 /docker/postgres_data
 /docker/postgres_data_test
 /docker/logs/*
+!/docker/logs/.gitkeep
 .env
