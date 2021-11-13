@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-gopher}
+      POSTGRES_PASSWORD: ${DB_PASS:-secret}
+      POSTGRES_DB: ${DB_NAME:-go-postgres}
+    volumes:
+      - ./docker/postgres_data:/var/lib/postgresql/data
+    ports:
+      - ${DB_PORT:-5432}:5432
+
+  postgres-test:
+    container_name: postgres_test
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${TEST_DB_USER:-gopher}
+      POSTGRES_PASSWORD: ${TEST_DB_PASS:-secret}
+      POSTGRES_DB: ${TEST_DB_NAME:-go-postgres-test}
+    volumes:
+      - ./docker/postgres_data_test:/var/lib/postgresql/data
+    ports:
+      - ${TEST_DB_PORT:-5433}:5432

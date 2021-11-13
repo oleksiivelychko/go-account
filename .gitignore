@@ -1,1 +1,5 @@
 .idea
+/docker/postgres_data
+/docker/postgres_data_test
+/docker/logs/*
+.env
