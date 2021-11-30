@@ -1,6 +1,9 @@
 package init
 
-import "os"
+import (
+	"gorm.io/gorm"
+	"os"
+)
 
 func Env() {
 	_ = os.Setenv("PORT", "8081")
@@ -18,4 +21,30 @@ func Env() {
 	_ = os.Setenv("TEST_DB_NAME", "go-postgres-test")
 	_ = os.Setenv("TEST_DB_USER", "gopher")
 	_ = os.Setenv("TEST_DB_PASS", "secret")
+}
+
+func DB() (*gorm.DB, error) {
+	return Connection(
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_SSL"),
+		os.Getenv("DB_TZ"),
+		os.Getenv("DB_LOG"),
+	)
+}
+
+func TestDB() (*gorm.DB, error) {
+	return Connection(
+		os.Getenv("TEST_DB_HOST"),
+		os.Getenv("TEST_DB_USER"),
+		os.Getenv("TEST_DB_PASS"),
+		os.Getenv("TEST_DB_NAME"),
+		os.Getenv("TEST_DB_PORT"),
+		os.Getenv("DB_SSL"),
+		os.Getenv("DB_TZ"),
+		os.Getenv("DB_LOG"),
+	)
 }
