@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+type AccountRepository struct {
+	db    *gorm.DB
+	debug bool
+}
+
 type Account struct {
 	ID        uint      `gorm:"primary_key;auto_increment" json:"id"`
 	Email     string    `gorm:"size:100;not null;unique" json:"email"`
@@ -15,10 +20,6 @@ type Account struct {
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 	Roles     []Role    `gorm:"many2many:accounts_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-}
-
-type AccountRepository struct {
-	orm ORM
 }
 
 func (model *Account) VerifyPassword(password string) error {
@@ -43,7 +44,7 @@ func (ar *AccountRepository) Validate(model *Account) error {
 		}
 
 		existsAccount := &Account{}
-		err := ar.orm.DB.Where("email = ?", model.Email).First(existsAccount).Error
+		err := ar.db.Where("email = ?", model.Email).First(existsAccount).Error
 		if err != nil && err != gorm.ErrRecordNotFound {
 			return err
 		}
@@ -61,10 +62,10 @@ func (ar *AccountRepository) Create(model *Account) (*Account, error) {
 		return &Account{}, err
 	}
 
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Create(&model).Error
+	if ar.debug {
+		err = ar.db.Debug().Create(&model).Error
 	} else {
-		err = ar.orm.DB.Create(&model).Error
+		err = ar.db.Create(&model).Error
 	}
 
 	if err != nil {
@@ -85,20 +86,20 @@ func (ar *AccountRepository) Update(model *Account) (*Account, error) {
 		"updated_at": time.Now(),
 	}
 
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Model(&model).Where("id = ?", model.ID).Updates(data).Error
+	if ar.debug {
+		err = ar.db.Debug().Model(&model).Where("id = ?", model.ID).Updates(data).Error
 	} else {
-		err = ar.orm.DB.Model(&model).Where("id = ?", model.ID).Updates(data).Error
+		err = ar.db.Model(&model).Where("id = ?", model.ID).Updates(data).Error
 	}
 
 	if err != nil {
 		return model, err
 	}
 
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Where("id = ?", model.ID).Take(&model).Error
+	if ar.debug {
+		err = ar.db.Debug().Where("id = ?", model.ID).Take(&model).Error
 	} else {
-		err = ar.orm.DB.Where("id = ?", model.ID).Take(&model).Error
+		err = ar.db.Where("id = ?", model.ID).Take(&model).Error
 	}
 
 	if err != nil {
@@ -111,20 +112,20 @@ func (ar *AccountRepository) Delete(model *Account) (int64, error) {
 	var err error
 	var db *gorm.DB
 
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Model(&model).Association("Roles").Clear()
+	if ar.debug {
+		err = ar.db.Debug().Model(&model).Association("Roles").Clear()
 	} else {
-		err = ar.orm.DB.Model(&model).Association("Roles").Clear()
+		err = ar.db.Model(&model).Association("Roles").Clear()
 	}
 
 	if err != nil {
 		return 0, err
 	}
 
-	if ar.orm.debug {
-		db = ar.orm.DB.Debug().Where("id = ?", model.ID).Delete(&Account{})
+	if ar.debug {
+		db = ar.db.Debug().Where("id = ?", model.ID).Delete(&Account{})
 	} else {
-		db = ar.orm.DB.Where("id = ?", model.ID).Delete(&Account{})
+		db = ar.db.Where("id = ?", model.ID).Delete(&Account{})
 	}
 
 	if db.Error != nil {
@@ -137,10 +138,10 @@ func (ar *AccountRepository) Delete(model *Account) (int64, error) {
 func (ar *AccountRepository) FindAll() (*[]Account, error) {
 	var accounts []Account
 	var err error
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Find(&accounts).Error
+	if ar.debug {
+		err = ar.db.Debug().Find(&accounts).Error
 	} else {
-		err = ar.orm.DB.Find(&accounts).Error
+		err = ar.db.Find(&accounts).Error
 	}
 	if err != nil {
 		return &[]Account{}, err
@@ -152,10 +153,10 @@ func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error) {
 	var db *gorm.DB
 	var model *Account
 
-	if ar.orm.debug {
-		db = ar.orm.DB.Debug().Preload("Roles").First(&model, uid)
+	if ar.debug {
+		db = ar.db.Debug().Preload("Roles").First(&model, uid)
 	} else {
-		db = ar.orm.DB.Preload("Roles").First(&model, uid)
+		db = ar.db.Preload("Roles").First(&model, uid)
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
@@ -166,10 +167,10 @@ func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error) {
 
 func (ar *AccountRepository) AddRoles(model *Account, roles []Role) (*Account, error) {
 	var err error
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Model(&model).Association("Roles").Append(&roles)
+	if ar.debug {
+		err = ar.db.Debug().Model(&model).Association("Roles").Append(&roles)
 	} else {
-		err = ar.orm.DB.Model(&model).Association("Roles").Append(&roles)
+		err = ar.db.Model(&model).Association("Roles").Append(&roles)
 	}
 
 	if err != nil {
@@ -187,10 +188,10 @@ func (ar *AccountRepository) AddRoles(model *Account, roles []Role) (*Account, e
 
 func (ar *AccountRepository) DeleteRoles(model *Account, roles []Role) (*Account, error) {
 	var err error
-	if ar.orm.debug {
-		err = ar.orm.DB.Debug().Model(&model).Association("Roles").Delete(&roles)
+	if ar.debug {
+		err = ar.db.Debug().Model(&model).Association("Roles").Delete(&roles)
 	} else {
-		err = ar.orm.DB.Model(&model).Association("Roles").Delete(&roles)
+		err = ar.db.Model(&model).Association("Roles").Delete(&roles)
 	}
 
 	if err != nil {
