@@ -1,11 +1,11 @@
-package init
+package initdb
 
 import (
 	"testing"
 )
 
 func TestDbConnection(t *testing.T) {
-	Env()
+	LoadEnv()
 	db, err := TestDB()
 
 	if err != nil {

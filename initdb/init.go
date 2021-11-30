@@ -1,11 +1,11 @@
-package init
+package initdb
 
 import (
 	"gorm.io/gorm"
 	"os"
 )
 
-func Env() {
+func LoadEnv() {
 	_ = os.Setenv("PORT", "8081")
 	_ = os.Setenv("DB_LOG", "enable")
 	_ = os.Setenv("DB_HOST", "localhost")
