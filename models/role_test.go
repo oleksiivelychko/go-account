@@ -2,33 +2,30 @@ package models
 
 import (
 	"database/sql"
-	"github.com/joho/godotenv"
+	"github.com/oleksiivelychko/go-account/initdb"
 	"log"
 	"testing"
 )
 
 func TestCreateRole(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
 	statement := "TRUNCATE roles RESTART IDENTITY CASCADE"
-	sqlExec := orm.DB.Exec(statement)
+	sqlExec := db.Exec(statement)
 	if sqlExec.Error != nil {
 		t.Errorf("[sql exec `"+statement+"`] -> %s", sqlExec.Error)
 	}
 
-	roleRepository := RoleRepository{*orm}
+	roleRepository := RoleRepository{db, true}
 	createdModel, err := roleRepository.Create(&Role{Name: "guest"})
 
 	if err != nil {
@@ -41,21 +38,18 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestUpdateRole(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
-	roleRepository := RoleRepository{*orm}
+	roleRepository := RoleRepository{db, true}
 	model, err := roleRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (rr *RoleRepository) FindOneByID(uid uint) (*Role, error)] -> %s", err)
@@ -73,21 +67,18 @@ func TestUpdateRole(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
-	roleRepository := RoleRepository{*orm}
+	roleRepository := RoleRepository{db, true}
 	model, err := roleRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (rr *RoleRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)

@@ -2,33 +2,30 @@ package models
 
 import (
 	"database/sql"
-	"github.com/joho/godotenv"
+	"github.com/oleksiivelychko/go-account/initdb"
 	"log"
 	"testing"
 )
 
 func TestCreateAccount(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
 	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
-	sqlExec := orm.DB.Exec(statement)
+	sqlExec := db.Exec(statement)
 	if sqlExec.Error != nil {
 		t.Errorf("[sql exec `"+statement+"`] -> %s", sqlExec.Error)
 	}
 
-	roleRepository := RoleRepository{*orm}
+	roleRepository := RoleRepository{db, true}
 	var roles []Role
 	roleAdmin, err := roleRepository.FindOneByName("admin")
 	if err != nil {
@@ -36,7 +33,7 @@ func TestCreateAccount(t *testing.T) {
 	}
 	roles = append(roles, *roleAdmin)
 
-	accountRepository := AccountRepository{*orm}
+	accountRepository := AccountRepository{db, true}
 	createdModel, err := accountRepository.Create(&Account{
 		Email:    "test@test.test",
 		Password: "secret",
@@ -66,21 +63,18 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
-	accountRepository := AccountRepository{*orm}
+	accountRepository := AccountRepository{db, true}
 	model, err := accountRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
@@ -104,28 +98,25 @@ func TestUpdateAccount(t *testing.T) {
 }
 
 func TestAddRolesToAccount(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
-	accountRepository := AccountRepository{*orm}
+	accountRepository := AccountRepository{db, true}
 	model, err := accountRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
 	}
 
 	// Assign roles to exists account
-	roleRepository := RoleRepository{*orm}
+	roleRepository := RoleRepository{db, true}
 	var roles []Role
 	roleManager, err := roleRepository.FindOneByName("manager")
 	if err != nil {
@@ -149,28 +140,25 @@ func TestAddRolesToAccount(t *testing.T) {
 }
 
 func TestDeleteRolesToAccount(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
-	accountRepository := AccountRepository{*orm}
+	accountRepository := AccountRepository{db, true}
 	model, err := accountRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
 	}
 
 	// Assign roles to exists account
-	roleRepository := RoleRepository{*orm}
+	roleRepository := RoleRepository{db, true}
 	var roles []Role
 	roleManager, err := roleRepository.FindOneByName("manager")
 	if err != nil {
@@ -194,21 +182,18 @@ func TestDeleteRolesToAccount(t *testing.T) {
 }
 
 func TestDeleteAccount(t *testing.T) {
-	err := godotenv.Load("./../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	initdb.LoadEnv()
+	db, err := initdb.TestDB()
+	dbConnection, _ := db.DB()
 
-	orm := InitDB(true)
-	DB, err := orm.DB.DB()
 	defer func(sqlDB *sql.DB) {
 		err := sqlDB.Close()
 		if err != nil {
 			log.Println(err)
 		}
-	}(DB)
+	}(dbConnection)
 
-	accountRepository := AccountRepository{*orm}
+	accountRepository := AccountRepository{db, true}
 	model, err := accountRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
