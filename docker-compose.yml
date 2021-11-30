@@ -14,6 +14,8 @@ services:
       - ./docker/postgres_data:/var/lib/postgresql/data
     ports:
       - ${DB_PORT:-5432}:5432
+    networks:
+      - go-network
 
   postgres-test:
     container_name: postgres_test
@@ -27,3 +29,9 @@ services:
       - ./docker/postgres_data_test:/var/lib/postgresql/data
     ports:
       - ${TEST_DB_PORT:-5433}:5432
+    networks:
+      - go-network
+
+networks:
+  go-network:
+    driver: bridge
