@@ -7,8 +7,8 @@ import (
 )
 
 type RoleRepository struct {
-	db    *gorm.DB
-	debug bool
+	DB    *gorm.DB
+	Debug bool
 }
 
 type Role struct {
@@ -22,7 +22,7 @@ type Role struct {
 func (rr *RoleRepository) Validate(model *Role) error {
 	if model.Name != "" {
 		existsRole := &Role{}
-		err := rr.db.Where("name = ?", model.Name).First(existsRole).Error
+		err := rr.DB.Where("name = ?", model.Name).First(existsRole).Error
 		if err != nil && err != gorm.ErrRecordNotFound {
 			return err
 		}
@@ -40,10 +40,10 @@ func (rr *RoleRepository) Create(model *Role) (*Role, error) {
 		return &Role{}, err
 	}
 
-	if rr.debug {
-		err = rr.db.Debug().Create(&model).Error
+	if rr.Debug {
+		err = rr.DB.Debug().Create(&model).Error
 	} else {
-		err = rr.db.Create(&model).Error
+		err = rr.DB.Create(&model).Error
 	}
 
 	if err != nil {
@@ -63,20 +63,20 @@ func (rr *RoleRepository) Update(model *Role) (*Role, error) {
 		"updated_at": time.Now(),
 	}
 
-	if rr.debug {
-		err = rr.db.Debug().Model(&model).Where("id = ?", model.ID).Updates(data).Error
+	if rr.Debug {
+		err = rr.DB.Debug().Model(&model).Where("id = ?", model.ID).Updates(data).Error
 	} else {
-		err = rr.db.Model(&model).Where("id = ?", model.ID).Updates(data).Error
+		err = rr.DB.Model(&model).Where("id = ?", model.ID).Updates(data).Error
 	}
 
 	if err != nil {
 		return model, err
 	}
 
-	if rr.debug {
-		err = rr.db.Debug().Where("id = ?", model.ID).Take(&model).Error
+	if rr.Debug {
+		err = rr.DB.Debug().Where("id = ?", model.ID).Take(&model).Error
 	} else {
-		err = rr.db.Where("id = ?", model.ID).Take(&model).Error
+		err = rr.DB.Where("id = ?", model.ID).Take(&model).Error
 	}
 
 	if err != nil {
@@ -87,10 +87,10 @@ func (rr *RoleRepository) Update(model *Role) (*Role, error) {
 
 func (rr *RoleRepository) Delete(model *Role) (int64, error) {
 	var db *gorm.DB
-	if rr.debug {
-		db = rr.db.Debug().Where("id = ?", model.ID).Delete(&Role{})
+	if rr.Debug {
+		db = rr.DB.Debug().Where("id = ?", model.ID).Delete(&Role{})
 	} else {
-		db = rr.db.Where("id = ?", model.ID).Delete(&Role{})
+		db = rr.DB.Where("id = ?", model.ID).Delete(&Role{})
 	}
 
 	if db.Error != nil {
@@ -102,10 +102,10 @@ func (rr *RoleRepository) Delete(model *Role) (int64, error) {
 func (rr *RoleRepository) FindAll() (*[]Role, error) {
 	var roles []Role
 	var err error
-	if rr.debug {
-		err = rr.db.Debug().Find(&roles).Error
+	if rr.Debug {
+		err = rr.DB.Debug().Find(&roles).Error
 	} else {
-		err = rr.db.Find(&roles).Error
+		err = rr.DB.Find(&roles).Error
 	}
 	if err != nil {
 		return &[]Role{}, err
@@ -116,10 +116,10 @@ func (rr *RoleRepository) FindAll() (*[]Role, error) {
 func (rr *RoleRepository) FindOneByID(uid uint) (*Role, error) {
 	var db *gorm.DB
 	var model *Role
-	if rr.debug {
-		db = rr.db.Debug().First(&model, uid)
+	if rr.Debug {
+		db = rr.DB.Debug().First(&model, uid)
 	} else {
-		db = rr.db.First(&model, uid)
+		db = rr.DB.First(&model, uid)
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
@@ -132,10 +132,10 @@ func (rr *RoleRepository) FindOneByName(name string) (*Role, error) {
 	var model *Role
 	var err error
 
-	if rr.debug {
-		err = rr.db.Debug().Where("name = ?", name).Take(&model).Error
+	if rr.Debug {
+		err = rr.DB.Debug().Where("name = ?", name).Take(&model).Error
 	} else {
-		err = rr.db.Debug().Where("name = ?", name).Take(&model).Error
+		err = rr.DB.Debug().Where("name = ?", name).Take(&model).Error
 	}
 
 	if err != nil {
