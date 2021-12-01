@@ -29,22 +29,22 @@ func (model *Account) VerifyPassword(password string) error {
 	return nil
 }
 
-func (ar *AccountRepository) Validate(model *Account) error {
-	if model.Password != "" {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(model.Password), bcrypt.DefaultCost)
+func (ar *AccountRepository) Validate(account *Account) error {
+	if account.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return err
 		}
-		model.Password = string(hashedPassword)
+		account.Password = string(hashedPassword)
 	}
 
-	if model.Email != "" {
-		if err := checkmail.ValidateFormat(model.Email); err != nil {
+	if account.Email != "" {
+		if err := checkmail.ValidateFormat(account.Email); err != nil {
 			return errors.New("invalid:email")
 		}
 
 		existsAccount := &Account{}
-		err := ar.DB.Where("email = ?", model.Email).First(existsAccount).Error
+		err := ar.DB.Where("email = ?", account.Email).First(existsAccount).Error
 		if err != nil && err != gorm.ErrRecordNotFound {
 			return err
 		}
@@ -56,66 +56,66 @@ func (ar *AccountRepository) Validate(model *Account) error {
 	return nil
 }
 
-func (ar *AccountRepository) Create(model *Account) (*Account, error) {
-	err := ar.Validate(model)
+func (ar *AccountRepository) Create(account *Account) (*Account, error) {
+	err := ar.Validate(account)
 	if err != nil {
 		return &Account{}, err
 	}
 
 	if ar.Debug {
-		err = ar.DB.Debug().Create(&model).Error
+		err = ar.DB.Debug().Create(&account).Error
 	} else {
-		err = ar.DB.Create(&model).Error
+		err = ar.DB.Create(&account).Error
 	}
 
 	if err != nil {
 		return &Account{}, err
 	}
-	return model, nil
+	return account, nil
 }
 
-func (ar *AccountRepository) Update(model *Account) (*Account, error) {
-	err := ar.Validate(model)
+func (ar *AccountRepository) Update(account *Account) (*Account, error) {
+	err := ar.Validate(account)
 	if err != nil {
-		return model, err
+		return account, err
 	}
 
 	data := map[string]interface{}{
-		"password":   model.Password,
-		"email":      model.Email,
+		"password":   account.Password,
+		"email":      account.Email,
 		"updated_at": time.Now(),
 	}
 
 	if ar.Debug {
-		err = ar.DB.Debug().Model(&model).Where("id = ?", model.ID).Updates(data).Error
+		err = ar.DB.Debug().Model(&account).Where("id = ?", account.ID).Updates(data).Error
 	} else {
-		err = ar.DB.Model(&model).Where("id = ?", model.ID).Updates(data).Error
+		err = ar.DB.Model(&account).Where("id = ?", account.ID).Updates(data).Error
 	}
 
 	if err != nil {
-		return model, err
+		return account, err
 	}
 
 	if ar.Debug {
-		err = ar.DB.Debug().Where("id = ?", model.ID).Take(&model).Error
+		err = ar.DB.Debug().Where("id = ?", account.ID).Take(&account).Error
 	} else {
-		err = ar.DB.Where("id = ?", model.ID).Take(&model).Error
+		err = ar.DB.Where("id = ?", account.ID).Take(&account).Error
 	}
 
 	if err != nil {
-		return model, err
+		return account, err
 	}
-	return model, nil
+	return account, nil
 }
 
-func (ar *AccountRepository) Delete(model *Account) (int64, error) {
+func (ar *AccountRepository) Delete(account *Account) (int64, error) {
 	var err error
 	var db *gorm.DB
 
 	if ar.Debug {
-		err = ar.DB.Debug().Model(&model).Association("Roles").Clear()
+		err = ar.DB.Debug().Model(&account).Association("Roles").Clear()
 	} else {
-		err = ar.DB.Model(&model).Association("Roles").Clear()
+		err = ar.DB.Model(&account).Association("Roles").Clear()
 	}
 
 	if err != nil {
@@ -123,9 +123,9 @@ func (ar *AccountRepository) Delete(model *Account) (int64, error) {
 	}
 
 	if ar.Debug {
-		db = ar.DB.Debug().Where("id = ?", model.ID).Delete(&Account{})
+		db = ar.DB.Debug().Where("id = ?", account.ID).Delete(&Account{})
 	} else {
-		db = ar.DB.Where("id = ?", model.ID).Delete(&Account{})
+		db = ar.DB.Where("id = ?", account.ID).Delete(&Account{})
 	}
 
 	if db.Error != nil {
@@ -135,74 +135,71 @@ func (ar *AccountRepository) Delete(model *Account) (int64, error) {
 	return db.RowsAffected, nil
 }
 
-func (ar *AccountRepository) FindAll() (*[]Account, error) {
-	var accounts []Account
-	var err error
+func (ar *AccountRepository) FindAll() (accounts *[]Account, err error) {
 	if ar.Debug {
 		err = ar.DB.Debug().Find(&accounts).Error
 	} else {
 		err = ar.DB.Find(&accounts).Error
 	}
+
 	if err != nil {
 		return &[]Account{}, err
 	}
-	return &accounts, err
+	return accounts, err
 }
 
 func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error) {
 	var db *gorm.DB
-	var model *Account
+	var account *Account
 
 	if ar.Debug {
-		db = ar.DB.Debug().Preload("Roles").First(&model, uid)
+		db = ar.DB.Debug().Preload("Roles").First(&account, uid)
 	} else {
-		db = ar.DB.Preload("Roles").First(&model, uid)
+		db = ar.DB.Preload("Roles").First(&account, uid)
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
-		return model, errors.New("account not found")
+		return account, errors.New("account not found")
 	}
-	return model, db.Error
+	return account, db.Error
 }
 
-func (ar *AccountRepository) AddRoles(model *Account, roles []Role) (*Account, error) {
+func (ar *AccountRepository) AddRoles(account *Account, roles []Role) (*Account, error) {
 	var err error
 	if ar.Debug {
-		err = ar.DB.Debug().Model(&model).Association("Roles").Append(&roles)
+		err = ar.DB.Debug().Model(&account).Association("Roles").Append(&roles)
 	} else {
-		err = ar.DB.Model(&model).Association("Roles").Append(&roles)
+		err = ar.DB.Model(&account).Association("Roles").Append(&roles)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	model, err = ar.FindOneByID(model.ID)
+	account, err = ar.FindOneByID(account.ID)
 
 	if err != nil {
 		return nil, err
 	}
-
-	return model, nil
+	return account, nil
 }
 
-func (ar *AccountRepository) DeleteRoles(model *Account, roles []Role) (*Account, error) {
+func (ar *AccountRepository) DeleteRoles(account *Account, roles []Role) (*Account, error) {
 	var err error
 	if ar.Debug {
-		err = ar.DB.Debug().Model(&model).Association("Roles").Delete(&roles)
+		err = ar.DB.Debug().Model(&account).Association("Roles").Delete(&roles)
 	} else {
-		err = ar.DB.Model(&model).Association("Roles").Delete(&roles)
+		err = ar.DB.Model(&account).Association("Roles").Delete(&roles)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	model, err = ar.FindOneByID(model.ID)
+	account, err = ar.FindOneByID(account.ID)
 
 	if err != nil {
 		return nil, err
 	}
-
-	return model, nil
+	return account, nil
 }

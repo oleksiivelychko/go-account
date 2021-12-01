@@ -19,10 +19,10 @@ type Role struct {
 	Accounts  []Account `gorm:"many2many:accounts_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
-func (rr *RoleRepository) Validate(model *Role) error {
-	if model.Name != "" {
+func (rr *RoleRepository) Validate(role *Role) error {
+	if role.Name != "" {
 		existsRole := &Role{}
-		err := rr.DB.Where("name = ?", model.Name).First(existsRole).Error
+		err := rr.DB.Where("name = ?", role.Name).First(existsRole).Error
 		if err != nil && err != gorm.ErrRecordNotFound {
 			return err
 		}
@@ -34,63 +34,63 @@ func (rr *RoleRepository) Validate(model *Role) error {
 	return nil
 }
 
-func (rr *RoleRepository) Create(model *Role) (*Role, error) {
-	err := rr.Validate(model)
+func (rr *RoleRepository) Create(role *Role) (*Role, error) {
+	err := rr.Validate(role)
 	if err != nil {
 		return &Role{}, err
 	}
 
 	if rr.Debug {
-		err = rr.DB.Debug().Create(&model).Error
+		err = rr.DB.Debug().Create(&role).Error
 	} else {
-		err = rr.DB.Create(&model).Error
+		err = rr.DB.Create(&role).Error
 	}
 
 	if err != nil {
 		return &Role{}, err
 	}
-	return model, nil
+	return role, nil
 }
 
-func (rr *RoleRepository) Update(model *Role) (*Role, error) {
-	err := rr.Validate(model)
+func (rr *RoleRepository) Update(role *Role) (*Role, error) {
+	err := rr.Validate(role)
 	if err != nil {
-		return model, err
+		return role, err
 	}
 
 	data := map[string]interface{}{
-		"name":       model.Name,
+		"name":       role.Name,
 		"updated_at": time.Now(),
 	}
 
 	if rr.Debug {
-		err = rr.DB.Debug().Model(&model).Where("id = ?", model.ID).Updates(data).Error
+		err = rr.DB.Debug().Model(&role).Where("id = ?", role.ID).Updates(data).Error
 	} else {
-		err = rr.DB.Model(&model).Where("id = ?", model.ID).Updates(data).Error
+		err = rr.DB.Model(&role).Where("id = ?", role.ID).Updates(data).Error
 	}
 
 	if err != nil {
-		return model, err
+		return role, err
 	}
 
 	if rr.Debug {
-		err = rr.DB.Debug().Where("id = ?", model.ID).Take(&model).Error
+		err = rr.DB.Debug().Where("id = ?", role.ID).Take(&role).Error
 	} else {
-		err = rr.DB.Where("id = ?", model.ID).Take(&model).Error
+		err = rr.DB.Where("id = ?", role.ID).Take(&role).Error
 	}
 
 	if err != nil {
-		return model, err
+		return role, err
 	}
-	return model, nil
+	return role, nil
 }
 
-func (rr *RoleRepository) Delete(model *Role) (int64, error) {
+func (rr *RoleRepository) Delete(role *Role) (int64, error) {
 	var db *gorm.DB
 	if rr.Debug {
-		db = rr.DB.Debug().Where("id = ?", model.ID).Delete(&Role{})
+		db = rr.DB.Debug().Where("id = ?", role.ID).Delete(&Role{})
 	} else {
-		db = rr.DB.Where("id = ?", model.ID).Delete(&Role{})
+		db = rr.DB.Where("id = ?", role.ID).Delete(&Role{})
 	}
 
 	if db.Error != nil {
@@ -99,49 +99,44 @@ func (rr *RoleRepository) Delete(model *Role) (int64, error) {
 	return db.RowsAffected, nil
 }
 
-func (rr *RoleRepository) FindAll() (*[]Role, error) {
-	var roles []Role
-	var err error
+func (rr *RoleRepository) FindAll() (roles *[]Role, err error) {
 	if rr.Debug {
 		err = rr.DB.Debug().Find(&roles).Error
 	} else {
 		err = rr.DB.Find(&roles).Error
 	}
+
 	if err != nil {
 		return &[]Role{}, err
 	}
-	return &roles, err
+	return roles, err
 }
 
-func (rr *RoleRepository) FindOneByID(uid uint) (*Role, error) {
+func (rr *RoleRepository) FindOneByID(uid uint) (role *Role, err error) {
 	var db *gorm.DB
-	var model *Role
 	if rr.Debug {
-		db = rr.DB.Debug().First(&model, uid)
+		db = rr.DB.Debug().First(&role, uid)
 	} else {
-		db = rr.DB.First(&model, uid)
+		db = rr.DB.First(&role, uid)
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
-		return model, errors.New("role not found")
+		return role, errors.New("role not found")
 	}
-	return model, db.Error
+	return role, db.Error
 }
 
-func (rr *RoleRepository) FindOneByName(name string) (*Role, error) {
-	var model *Role
-	var err error
-
+func (rr *RoleRepository) FindOneByName(name string) (role *Role, err error) {
 	if rr.Debug {
-		err = rr.DB.Debug().Where("name = ?", name).Take(&model).Error
+		err = rr.DB.Debug().Where("name = ?", name).Take(&role).Error
 	} else {
-		err = rr.DB.Debug().Where("name = ?", name).Take(&model).Error
+		err = rr.DB.Debug().Where("name = ?", name).Take(&role).Error
 	}
 
 	if err != nil {
-		return model, errors.New("role not found")
+		return role, errors.New("role not found")
 	}
-	return model, nil
+	return role, nil
 }
 
 func (rr *RoleRepository) FindOneByNameOrCreate(name string) (*Role, error) {

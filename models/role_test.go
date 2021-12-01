@@ -26,14 +26,14 @@ func TestCreateRole(t *testing.T) {
 	}
 
 	roleRepository := RoleRepository{db, true}
-	createdModel, err := roleRepository.Create(&Role{Name: "guest"})
+	createdRole, err := roleRepository.Create(&Role{Name: "guest"})
 
 	if err != nil {
 		t.Errorf("[func (rr *RoleRepository) Create(model *Role) (*Role, error)] -> %s", err)
 	}
 
-	if createdModel.Name != "guest" {
-		t.Errorf("[`Role` model.Name] -> %s != 'guest'", createdModel.Name)
+	if createdRole.Name != "guest" {
+		t.Errorf("[`Role` model.Name] -> %s != 'guest'", createdRole.Name)
 	}
 }
 
@@ -50,19 +50,19 @@ func TestUpdateRole(t *testing.T) {
 	}(dbConnection)
 
 	roleRepository := RoleRepository{db, true}
-	model, err := roleRepository.FindOneByID(1)
+	existsRole, err := roleRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (rr *RoleRepository) FindOneByID(uid uint) (*Role, error)] -> %s", err)
 	}
 
-	model.Name = "user"
-	updatedModel, err := roleRepository.Update(model)
+	existsRole.Name = "user"
+	updatedRole, err := roleRepository.Update(existsRole)
 	if err != nil {
 		t.Errorf("[func (rr *RoleRepository) Update(model *Role) (*Role, error)] -> %s", err)
 	}
 
-	if updatedModel.Name != "user" {
-		t.Errorf("[`Role` model.Name] -> %s != 'user'", updatedModel.Name)
+	if updatedRole.Name != "user" {
+		t.Errorf("[`Role` model.Name] -> %s != 'user'", updatedRole.Name)
 	}
 }
 
@@ -79,11 +79,11 @@ func TestDelete(t *testing.T) {
 	}(dbConnection)
 
 	roleRepository := RoleRepository{db, true}
-	model, err := roleRepository.FindOneByID(1)
+	role, err := roleRepository.FindOneByID(1)
 	if err != nil {
 		t.Errorf("[func (rr *RoleRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
 	}
-	rowsAffected, err := roleRepository.Delete(model)
+	rowsAffected, err := roleRepository.Delete(role)
 	if err != nil && rowsAffected == 0 {
 		t.Errorf("[func (rr *RoleRepository) Delete(model *Role) (int64, error)] -> %s", err)
 	}
