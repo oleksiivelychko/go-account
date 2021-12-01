@@ -2,6 +2,7 @@ package initdb
 
 import (
 	"fmt"
+	"github.com/oleksiivelychko/go-account/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -48,7 +49,7 @@ func Connection(host, user, pass, name, port, ssl, tz, logging string) (db *gorm
 		db, err = gorm.Open(postgres.Open(dsn))
 	}
 
-	/*if cfg.Debug {
+	if logging == "enable" {
 		_ = db.Debug().AutoMigrate(
 			&models.Account{},
 			&models.Role{},
@@ -58,7 +59,7 @@ func Connection(host, user, pass, name, port, ssl, tz, logging string) (db *gorm
 			&models.Account{},
 			models.Role{},
 		)
-	}*/
+	}
 
 	return
 }
