@@ -9,7 +9,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -23,14 +22,13 @@ func Connection(host, user, pass, name, port, ssl, tz, logging string) (db *gorm
 		currentTime := time.Now().UTC()
 		formatDate := currentTime.Format("01-02-2006")
 
-		wd, _ := os.Getwd()
-		parentDirectory := filepath.Dir(wd) + "/"
-
 		var f *os.File
-		f, err = os.OpenFile(
-			parentDirectory+"docker/logs/gorm_"+formatDate+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		f, err = os.OpenFile("docker/logs/gorm_"+formatDate+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			return
+			f, err = os.OpenFile("../docker/logs/gorm_"+formatDate+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+			if err != nil {
+				return
+			}
 		}
 
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
