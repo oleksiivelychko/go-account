@@ -27,11 +27,8 @@ func TestCreateAccount(t *testing.T) {
 
 	roleRepository := RoleRepository{db, true}
 	var roles []Role
-	roleAdmin, err := roleRepository.FindOneByName("admin")
-	if err != nil {
-		roleAdmin, err = roleRepository.Create(&Role{Name: "admin"})
-	}
-	roles = append(roles, *roleAdmin)
+	role, _ := roleRepository.FindOneByNameOrCreate("user")
+	roles = append(roles, *role)
 
 	accountRepository := AccountRepository{db, true}
 	createdModel, err := accountRepository.Create(&Account{
@@ -57,8 +54,8 @@ func TestCreateAccount(t *testing.T) {
 		t.Errorf("[`Account` model.Roles len] -> %d == '0'", 0)
 	}
 
-	if createdModel.Roles[0].Name != "admin" {
-		t.Errorf("[`Account` model.Roles 'admin'] -> %s != 'admin'", createdModel.Roles[0].Name)
+	if createdModel.Roles[0].Name != "user" {
+		t.Errorf("[`Account` model.Roles 'user'] -> %s != 'user'", createdModel.Roles[0].Name)
 	}
 }
 

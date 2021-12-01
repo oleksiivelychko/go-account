@@ -143,3 +143,11 @@ func (rr *RoleRepository) FindOneByName(name string) (*Role, error) {
 	}
 	return model, nil
 }
+
+func (rr *RoleRepository) FindOneByNameOrCreate(name string) (*Role, error) {
+	role, err := rr.FindOneByName(name)
+	if err != nil {
+		role, err = rr.Create(&Role{Name: name})
+	}
+	return role, nil
+}
