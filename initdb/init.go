@@ -7,7 +7,7 @@ import (
 
 func LoadEnv() {
 	_ = os.Setenv("PORT", "8081")
-	_ = os.Setenv("DB_LOG", "enable")
+	_ = os.Setenv("DB_LOG", "disable")
 	_ = os.Setenv("DB_HOST", "localhost")
 	_ = os.Setenv("DB_PORT", "5432")
 	_ = os.Setenv("DB_NAME", "go-postgres")
