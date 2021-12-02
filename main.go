@@ -27,5 +27,6 @@ func main() {
 	}(dbConnection)
 
 	http.HandleFunc("/api/account/register", handlers.RegisterHandler(db))
+	http.HandleFunc("/api/account/login", handlers.LoginHandler(db))
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
 }
