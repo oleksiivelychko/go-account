@@ -41,7 +41,7 @@ func TestLoginHandler(t *testing.T) {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
 
-	loggedAccount := &models.Account{}
+	loggedAccount := &models.AccountSerialized{}
 	err = json.Unmarshal(body, &loggedAccount)
 	if err != nil {
 		t.Fatalf("unable to unmarshal response body: %s", err.Error())
@@ -49,9 +49,5 @@ func TestLoginHandler(t *testing.T) {
 
 	if loggedAccount.Email != inputAccount.Email {
 		t.Fatalf("emails doesn's match")
-	}
-
-	if loggedAccount.VerifyPassword(inputAccount.Password) != nil {
-		t.Fatalf("passwords doesn't match")
 	}
 }

@@ -19,6 +19,10 @@ type Role struct {
 	Accounts  []Account `gorm:"many2many:accounts_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
+type RoleSerialized struct {
+	Name string `json:"name"`
+}
+
 func (rr *RoleRepository) Validate(role *Role) error {
 	if role.Name != "" {
 		existsRole := &Role{}

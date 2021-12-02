@@ -22,11 +22,30 @@ type Account struct {
 	Roles     []Role    `gorm:"many2many:accounts_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
+type AccountSerialized struct {
+	ID    uint             `json:"id"`
+	Email string           `json:"email"`
+	Roles []RoleSerialized `json:"roles"`
+}
+
 func (model *Account) VerifyPassword(password string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(model.Password), []byte(password)); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (model *Account) Serialize() *AccountSerialized {
+	accountSerialized := &AccountSerialized{
+		ID:    model.ID,
+		Email: model.Email,
+	}
+
+	for _, role := range model.Roles {
+		accountSerialized.Roles = append(accountSerialized.Roles, RoleSerialized{Name: role.Name})
+	}
+
+	return accountSerialized
 }
 
 func (ar *AccountRepository) Validate(account *Account) error {
@@ -204,7 +223,9 @@ func (ar *AccountRepository) DeleteRoles(account *Account, roles []Role) (*Accou
 	return account, nil
 }
 
-func (ar *AccountRepository) MakeAuth(email, password string) (account *Account, err error) {
+func (ar *AccountRepository) MakeAuth(email, password string) (accountSerialized *AccountSerialized, err error) {
+	var account *Account
+
 	if ar.Debug {
 		err = ar.DB.Debug().Where("email = ?", email).Preload("Roles").First(&account).Error
 	} else {
@@ -214,8 +235,9 @@ func (ar *AccountRepository) MakeAuth(email, password string) (account *Account,
 	if err == nil {
 		err = account.VerifyPassword(password)
 		if err != nil {
-			return account, errors.New("invalid password")
+			return nil, errors.New("invalid password")
 		}
 	}
-	return
+
+	return account.Serialize(), err
 }
