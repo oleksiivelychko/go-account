@@ -203,3 +203,19 @@ func (ar *AccountRepository) DeleteRoles(account *Account, roles []Role) (*Accou
 	}
 	return account, nil
 }
+
+func (ar *AccountRepository) MakeAuth(email, password string) (account *Account, err error) {
+	if ar.Debug {
+		err = ar.DB.Debug().Where("email = ?", email).Preload("Roles").First(&account).Error
+	} else {
+		err = ar.DB.Where("email = ?", email).Preload("Roles").First(&account).Error
+	}
+
+	if err == nil {
+		err = account.VerifyPassword(password)
+		if err != nil {
+			return account, errors.New("invalid password")
+		}
+	}
+	return
+}
