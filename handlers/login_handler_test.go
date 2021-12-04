@@ -50,4 +50,16 @@ func TestLoginHandler(t *testing.T) {
 	if loggedAccount.Email != inputAccount.Email {
 		t.Fatalf("emails doesn's match")
 	}
+
+	if loggedAccount.AccessToken == "" {
+		t.Fatalf("got empty `access-token`")
+	}
+
+	if loggedAccount.RefreshToken == "" {
+		t.Fatalf("got empty `refresh-token`")
+	}
+
+	if loggedAccount.ExpirationTime == "" {
+		t.Fatalf("got empty `expiration-time`")
+	}
 }
