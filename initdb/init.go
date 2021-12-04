@@ -21,6 +21,7 @@ func LoadEnv() {
 	_ = os.Setenv("TEST_DB_NAME", "go-postgres-test")
 	_ = os.Setenv("TEST_DB_USER", "gopher")
 	_ = os.Setenv("TEST_DB_PASS", "secret")
+	_ = os.Setenv("API_ACCESS_TOKEN_URL", "https://oleksiivelychkogojwtissuer.herokuapp.com/access-token")
 }
 
 func DB() (*gorm.DB, error) {
