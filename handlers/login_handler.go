@@ -3,10 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/models"
+	"github.com/oleksiivelychko/go-account/requests"
 	"gorm.io/gorm"
 	"net/http"
-	"os"
-	"strconv"
 )
 
 func LoginHandler(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -33,18 +32,10 @@ func LoginHandler(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		apiAccessTokenUrl := os.Getenv("API_ACCESS_TOKEN_URL")
-		if apiAccessTokenUrl == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("API_ACCESS_TOKEN_URL is empty"))
-			return
-		}
-
-		var apiRequestUrl = apiAccessTokenUrl + "?userId=" + strconv.Itoa(int(account.ID))
-		response, err := http.Get(apiRequestUrl)
+		response, err := requests.AccessTokenRequest(account.ID)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("unable to make request to `" + apiRequestUrl))
+			w.WriteHeader(http.StatusUnauthorized)
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
