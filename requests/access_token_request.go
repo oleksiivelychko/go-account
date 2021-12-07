@@ -1,23 +1,29 @@
 package requests
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
+	"github.com/oleksiivelychko/go-account/models"
 	"net/http"
 	"os"
 )
 
-func AccessTokenRequest(userId uint) (*http.Response, error) {
-	apiAccessTokenUrl := os.Getenv("API_ACCESS_TOKEN_URL")
+func AccessTokenRequest(accountSerialized *models.AccountSerialized) (*models.AccountSerialized, error) {
+	apiAccessTokenUrl := os.Getenv("APP_JWT_URL")
 	if apiAccessTokenUrl == "" {
-		return nil, errors.New("API_ACCESS_TOKEN_URL is not set")
+		return accountSerialized, fmt.Errorf("APP_JWT_URL is not set")
 	}
 
-	var apiRequestUrl = fmt.Sprintf("%s?userId=%d", apiAccessTokenUrl, userId)
+	var apiRequestUrl = fmt.Sprintf("%s/access-token/?userId=%d", apiAccessTokenUrl, accountSerialized.ID)
 	response, err := http.Get(apiRequestUrl)
 	if err != nil {
-		return response, errors.New(fmt.Sprintf("unable to make request to `%s`", apiRequestUrl))
+		return accountSerialized, fmt.Errorf("unable to make request to `%s`", apiRequestUrl)
 	}
 
-	return response, err
+	err = json.NewDecoder(response.Body).Decode(&accountSerialized)
+	if err != nil {
+		return accountSerialized, fmt.Errorf("unable to parse response body")
+	}
+
+	return accountSerialized, nil
 }

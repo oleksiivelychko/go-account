@@ -32,17 +32,10 @@ func LoginHandler(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		response, err := requests.AccessTokenRequest(account.ID)
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		err = json.NewDecoder(response.Body).Decode(&account)
+		account, err = requests.AccessTokenRequest(account)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("unable to parse response body"))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
