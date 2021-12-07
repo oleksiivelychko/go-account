@@ -23,12 +23,14 @@ type Account struct {
 }
 
 type AccountSerialized struct {
-	ID             uint             `json:"id"`
-	Email          string           `json:"email"`
-	Roles          []RoleSerialized `json:"roles"`
-	AccessToken    string           `json:"access-token"`
-	RefreshToken   string           `json:"refresh-token"`
-	ExpirationTime string           `json:"expiration-time"`
+	ID             uint             `json:"id,omitempty"`
+	Email          string           `json:"email,omitempty"`
+	Roles          []RoleSerialized `json:"roles,omitempty"`
+	AccessToken    string           `json:"access-token,omitempty"`
+	RefreshToken   string           `json:"refresh-token,omitempty"`
+	ExpirationTime string           `json:"expiration-time,omitempty"`
+	ErrorMessage   string           `json:"error-message,omitempty"`
+	ErrorCode      uint8            `json:"error-code,omitempty"`
 }
 
 func (model *Account) VerifyPassword(password string) error {
