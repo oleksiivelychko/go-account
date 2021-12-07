@@ -26,4 +26,5 @@ TEST_DB_PORT=5433
 TEST_DB_NAME=go-postgres-test
 TEST_DB_USER=gopher
 TEST_DB_PASS=secret
+APP_JWT_URL=https://oleksiivelychkogojwtissuer.herokuapp.com
 ```
