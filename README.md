@@ -28,3 +28,5 @@ TEST_DB_USER=gopher
 TEST_DB_PASS=secret
 APP_JWT_URL=https://oleksiivelychkogojwtissuer.herokuapp.com
 ```
+
+![how it works](docker/readme.png)
