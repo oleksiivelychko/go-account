@@ -22,11 +22,12 @@ func main() {
 	defer func(sqlDB *sql.DB) {
 		err = sqlDB.Close()
 		if err != nil {
-			log.Fatalf("unbale to close database connection: %s", err)
+			log.Fatalf("unable to close database connection: %s", err)
 		}
 	}(dbConnection)
 
 	http.HandleFunc("/api/account/register", handlers.RegisterHandler(db))
 	http.HandleFunc("/api/account/login", handlers.LoginHandler(db))
+	http.HandleFunc("/api/account/user", handlers.UserHandler(db))
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
 }
