@@ -1,6 +1,5 @@
 .idea
-/docker/postgres_data
-/docker/postgres_data_test
-/docker/logs/*
-!/docker/logs/.gitkeep
-.env
+/.dock/postgres_data
+/.dock/postgres_data_test
+/.dock/logs/*
+!/.dock/logs/.gitkeep
