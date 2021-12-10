@@ -43,7 +43,10 @@ func Connection(host, user, pass, name, port, ssl, tz, logging string) (db *gorm
 			),
 		})
 	} else {
-		db, err = gorm.Open(postgres.Open(dsn))
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			// mute log, including console errors
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
 	}
 
 	return
