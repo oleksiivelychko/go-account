@@ -4,9 +4,9 @@
 
 💡 Deployed on <a href="https://oleksiivelychkogoaccount.herokuapp.com">Heroku</a>
 
-Run tests:
+Run tests sequentially with limit of the maximum number of test running in parallel:
 ```
-go clean -testcache && go test ./*/
+go clean -testcache && go test ./*/ -p 1
 ```
 
 Available .env variables with default values:
