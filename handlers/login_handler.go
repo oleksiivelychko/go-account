@@ -23,7 +23,7 @@ func LoginHandler(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		accountRepository := models.AccountRepository{DB: db, Debug: true}
+		accountRepository := models.AccountRepository{DB: db, Debug: false}
 		account, err := accountRepository.MakeAuth(inputAccount.Email, inputAccount.Password)
 
 		if err != nil {

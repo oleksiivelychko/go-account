@@ -5,20 +5,47 @@ import (
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
+	"gorm.io/gorm"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestLoginHandler(t *testing.T) {
+func initTest() (*gorm.DB, error) {
 	initdb.LoadEnv()
-	db, _ := initdb.TestDB()
+	db, err := initdb.TestDB()
+	err = models.AutoMigrate(db)
+
+	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
+	sqlExec := db.Exec(statement)
+	if sqlExec.Error != nil {
+		return nil, sqlExec.Error
+	}
+
+	statement = "TRUNCATE roles RESTART IDENTITY CASCADE"
+	sqlExec = db.Exec(statement)
+	if sqlExec.Error != nil {
+		return nil, sqlExec.Error
+	}
+
+	return db, err
+}
+
+func TestLoginHandler(t *testing.T) {
+	db, _ := initTest()
+
+	accountRepository := models.AccountRepository{DB: db, Debug: false}
+	_, _ = accountRepository.Create(&models.Account{
+		Email:    "test@test.test",
+		Password: "secret",
+	})
 
 	inputAccount := &models.Account{
 		Email:    "test@test.test",
 		Password: "secret",
 	}
+
 	payload := new(bytes.Buffer)
 	_ = json.NewEncoder(payload).Encode(inputAccount)
 
