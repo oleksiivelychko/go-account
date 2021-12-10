@@ -1,6 +1,6 @@
 # go-account
 
-### Microservice provides API to manage users accounts including ACL.
+### Microservice provides API to manage users accounts including ACL through third-party JWT microservice.
 
 💡 Deployed on <a href="https://oleksiivelychkogoaccount.herokuapp.com">Heroku</a>
 
