@@ -1,31 +1,16 @@
 package models
 
 import (
-	"database/sql"
-	"github.com/oleksiivelychko/go-account/initdb"
-	"log"
 	"testing"
 )
 
 func TestCreateRole(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	statement := "TRUNCATE roles RESTART IDENTITY CASCADE"
-	sqlExec := db.Exec(statement)
-	if sqlExec.Error != nil {
-		t.Errorf("[sql exec `"+statement+"`] -> %s", sqlExec.Error)
+	db, err := initTest()
+	if err != nil {
+		t.Errorf("error during initialization test environment: %s", err)
 	}
 
-	roleRepository := RoleRepository{db, true}
+	roleRepository := RoleRepository{db, false}
 	createdRole, err := roleRepository.Create(&Role{Name: "guest"})
 
 	if err != nil {
@@ -38,22 +23,13 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestUpdateRole(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	roleRepository := RoleRepository{db, true}
-	existsRole, err := roleRepository.FindOneByID(1)
+	db, err := initTest()
 	if err != nil {
-		t.Errorf("[func (rr *RoleRepository) FindOneByID(uid uint) (*Role, error)] -> %s", err)
+		t.Errorf("error during initialization test environment: %s", err)
 	}
+
+	roleRepository := RoleRepository{db, false}
+	existsRole, err := roleRepository.Create(&Role{Name: "guest"})
 
 	existsRole.Name = "user"
 	updatedRole, err := roleRepository.Update(existsRole)
@@ -67,22 +43,14 @@ func TestUpdateRole(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	roleRepository := RoleRepository{db, true}
-	role, err := roleRepository.FindOneByID(1)
+	db, err := initTest()
 	if err != nil {
-		t.Errorf("[func (rr *RoleRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
+		t.Errorf("error during initialization test environment: %s", err)
 	}
+
+	roleRepository := RoleRepository{db, false}
+	role, err := roleRepository.Create(&Role{Name: "guest"})
+
 	rowsAffected, err := roleRepository.Delete(role)
 	if err != nil && rowsAffected == 0 {
 		t.Errorf("[func (rr *RoleRepository) Delete(model *Role) (int64, error)] -> %s", err)

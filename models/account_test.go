@@ -1,36 +1,43 @@
 package models
 
 import (
-	"database/sql"
 	"github.com/oleksiivelychko/go-account/initdb"
-	"log"
+	"gorm.io/gorm"
 	"testing"
 )
 
-func TestCreateAccount(t *testing.T) {
+func initTest() (*gorm.DB, error) {
 	initdb.LoadEnv()
 	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
+	err = AutoMigrate(db)
 
 	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
 	sqlExec := db.Exec(statement)
 	if sqlExec.Error != nil {
-		t.Errorf("[sql exec `"+statement+"`] -> %s", sqlExec.Error)
+		return nil, sqlExec.Error
 	}
 
-	roleRepository := RoleRepository{db, true}
+	statement = "TRUNCATE roles RESTART IDENTITY CASCADE"
+	sqlExec = db.Exec(statement)
+	if sqlExec.Error != nil {
+		return nil, sqlExec.Error
+	}
+
+	return db, err
+}
+
+func TestCreateAccount(t *testing.T) {
+	db, err := initTest()
+	if err != nil {
+		t.Errorf("error during initialization test environment: %s", err)
+	}
+
+	roleRepository := RoleRepository{db, false}
 	var roles []Role
 	role, _ := roleRepository.FindOneByNameOrCreate("user")
 	roles = append(roles, *role)
 
-	accountRepository := AccountRepository{db, true}
+	accountRepository := AccountRepository{db, false}
 	createdModel, err := accountRepository.Create(&Account{
 		Email:    "test@test.test",
 		Password: "secret",
@@ -60,21 +67,19 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	accountRepository := AccountRepository{db, true}
-	model, err := accountRepository.FindOneByID(1)
+	db, err := initTest()
 	if err != nil {
-		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
+		t.Errorf("error during initialization test environment: %s", err)
+	}
+
+	accountRepository := AccountRepository{db, false}
+	model, err := accountRepository.Create(&Account{
+		Email:    "test@test.test",
+		Password: "secret",
+	})
+
+	if err != nil {
+		t.Errorf("[func (ar *AccountRepository) Create(model *Account) (*Account, error)] -> %s", err)
 	}
 
 	model.Email = "test1@test1.test1"
@@ -95,25 +100,23 @@ func TestUpdateAccount(t *testing.T) {
 }
 
 func TestAddRolesToAccount(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	accountRepository := AccountRepository{db, true}
-	model, err := accountRepository.FindOneByID(1)
+	db, err := initTest()
 	if err != nil {
-		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
+		t.Errorf("error during initialization test environment: %s", err)
 	}
 
-	// Assign roles to exists account
-	roleRepository := RoleRepository{db, true}
+	accountRepository := AccountRepository{db, false}
+	model, err := accountRepository.Create(&Account{
+		Email:    "test@test.test",
+		Password: "secret",
+	})
+
+	if err != nil {
+		t.Errorf("[func (ar *AccountRepository) Create(model *Account) (*Account, error)] -> %s", err)
+	}
+
+	// assign roles to exists account
+	roleRepository := RoleRepository{db, false}
 	var roles []Role
 	roleManager, err := roleRepository.FindOneByName("manager")
 	if err != nil {
@@ -131,69 +134,58 @@ func TestAddRolesToAccount(t *testing.T) {
 	if err != nil {
 		t.Errorf("[`Account` model.AddRoles] -> %s", err)
 	}
-	if len(model.Roles) != 3 {
-		t.Errorf("[`Account` model.Roles len] -> %d != '3'", len(model.Roles))
+	if len(model.Roles) != 2 {
+		t.Errorf("[`Account` model.Roles len] -> %d != 2", len(model.Roles))
 	}
 }
 
 func TestDeleteRolesToAccount(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	accountRepository := AccountRepository{db, true}
-	model, err := accountRepository.FindOneByID(1)
+	db, err := initTest()
 	if err != nil {
-		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
+		t.Errorf("error during initialization test environment: %s", err)
 	}
 
-	// Assign roles to exists account
-	roleRepository := RoleRepository{db, true}
+	accountRepository := AccountRepository{db, false}
+	model, err := accountRepository.Create(&Account{
+		Email:    "test@test.test",
+		Password: "secret",
+	})
+
+	if err != nil {
+		t.Errorf("[func (ar *AccountRepository) Create(model *Account) (*Account, error)] -> %s", err)
+	}
+
+	// assign roles to exists account
+	roleRepository := RoleRepository{db, false}
 	var roles []Role
-	roleManager, err := roleRepository.FindOneByName("manager")
-	if err != nil {
-		roleManager, err = roleRepository.Create(&Role{Name: "manager"})
-	}
+	roleManager, err := roleRepository.Create(&Role{Name: "manager"})
 	roles = append(roles, *roleManager)
-
-	roleSupplier, err := roleRepository.FindOneByName("supplier")
-	if err != nil {
-		roleSupplier, err = roleRepository.Create(&Role{Name: "supplier"})
-	}
+	roleSupplier, err := roleRepository.Create(&Role{Name: "supplier"})
 	roles = append(roles, *roleSupplier)
 
 	model, err = accountRepository.DeleteRoles(model, roles)
 	if err != nil {
 		t.Errorf("[`Account` model.AddRoles] -> %s", err)
 	}
-	if len(model.Roles) != 1 {
-		t.Errorf("[`Account` model.Roles len] -> %d != '1'", len(model.Roles))
+	if len(model.Roles) != 0 {
+		t.Errorf("[`Account` model.Roles len] -> %d != 0", len(model.Roles))
 	}
 }
 
 func TestDeleteAccount(t *testing.T) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	dbConnection, _ := db.DB()
-
-	defer func(sqlDB *sql.DB) {
-		err := sqlDB.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(dbConnection)
-
-	accountRepository := AccountRepository{db, true}
-	model, err := accountRepository.FindOneByID(1)
+	db, err := initTest()
 	if err != nil {
-		t.Errorf("[func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error)] -> %s", err)
+		t.Errorf("error during initialization test environment: %s", err)
+	}
+
+	accountRepository := AccountRepository{db, false}
+	model, err := accountRepository.Create(&Account{
+		Email:    "test@test.test",
+		Password: "secret",
+	})
+
+	if err != nil {
+		t.Errorf("[func (ar *AccountRepository) Create(model *Account) (*Account, error)] -> %s", err)
 	}
 
 	rowsAffected, err := accountRepository.Delete(model)
