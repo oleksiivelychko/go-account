@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"github.com/badoux/checkmail"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -183,7 +184,7 @@ func (ar *AccountRepository) FindOneByID(uid uint) (*Account, error) {
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
-		return account, errors.New("account not found")
+		return account, fmt.Errorf("account not found: %s", db.Error)
 	}
 	return account, db.Error
 }
@@ -240,7 +241,7 @@ func (ar *AccountRepository) MakeAuth(email, password string) (accountSerialized
 	if err == nil {
 		err = account.VerifyPassword(password)
 		if err != nil {
-			return nil, errors.New("invalid password")
+			return nil, fmt.Errorf("invalid password: %s", err)
 		}
 	}
 

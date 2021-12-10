@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -125,7 +126,7 @@ func (rr *RoleRepository) FindOneByID(uid uint) (role *Role, err error) {
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
-		return role, errors.New("role not found")
+		return role, fmt.Errorf("role `%d` doesn't managed to find: %s", uid, db.Error)
 	}
 	return role, db.Error
 }
@@ -134,11 +135,11 @@ func (rr *RoleRepository) FindOneByName(name string) (role *Role, err error) {
 	if rr.Debug {
 		err = rr.DB.Debug().Where("name = ?", name).Take(&role).Error
 	} else {
-		err = rr.DB.Debug().Where("name = ?", name).Take(&role).Error
+		err = rr.DB.Where("name = ?", name).Take(&role).Error
 	}
 
 	if err != nil {
-		return role, errors.New("role not found")
+		return role, fmt.Errorf("role `%s` doesn't managed to find: %s", name, err)
 	}
 	return role, nil
 }
