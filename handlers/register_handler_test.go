@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
 	"io/ioutil"
 	"net/http"
@@ -12,14 +11,7 @@ import (
 )
 
 func TestRegisterHandler(t *testing.T) {
-	initdb.LoadEnv()
-	db, _ := initdb.TestDB()
-
-	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
-	sqlExec := db.Exec(statement)
-	if sqlExec.Error != nil {
-		t.Errorf("[sql exec `"+statement+"`] -> %s", sqlExec.Error)
-	}
+	db, _ := initTest()
 
 	inputAccount := &models.Account{
 		Email:    "test@test.test",

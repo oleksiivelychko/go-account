@@ -22,12 +22,12 @@ func RegisterHandler(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		roleRepository := models.RoleRepository{DB: db, Debug: true}
+		roleRepository := models.RoleRepository{DB: db, Debug: false}
 		var roles []models.Role
 		role, err := roleRepository.FindOneByNameOrCreate("user")
 		roles = append(roles, *role)
 
-		accountRepository := models.AccountRepository{DB: db, Debug: true}
+		accountRepository := models.AccountRepository{DB: db, Debug: false}
 		account, err := accountRepository.Create(&models.Account{
 			Email:    inputAccount.Email,
 			Password: inputAccount.Password,
