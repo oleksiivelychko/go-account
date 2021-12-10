@@ -20,6 +20,10 @@ func AccessTokenRequest(accountSerialized *models.AccountSerialized) (*models.Ac
 		return accountSerialized, fmt.Errorf("unable to make request to `%s`", apiRequestUrl)
 	}
 
+	if response.StatusCode != 201 {
+		return accountSerialized, fmt.Errorf("unable to make succesful request: status code is %d", response.StatusCode)
+	}
+
 	err = json.NewDecoder(response.Body).Decode(&accountSerialized)
 	if err != nil {
 		return accountSerialized, fmt.Errorf("unable to parse response body")
