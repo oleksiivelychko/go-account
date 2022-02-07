@@ -21,7 +21,7 @@ func AccessTokenRequest(accountSerialized *models.AccountSerialized) (*models.Ac
 	}
 
 	if response.StatusCode != 201 {
-		return accountSerialized, fmt.Errorf("unable to make succesful request: status code is %d", response.StatusCode)
+		return accountSerialized, fmt.Errorf("unable to make successful request: status code is %d", response.StatusCode)
 	}
 
 	err = json.NewDecoder(response.Body).Decode(&accountSerialized)

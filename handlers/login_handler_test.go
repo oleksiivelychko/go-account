@@ -52,15 +52,12 @@ func TestLoginHandler(t *testing.T) {
 	request, _ := http.NewRequest("POST", "/api/account/login", payload)
 	response := httptest.NewRecorder()
 
-	LoginHandler(db)(response, request)
+	loginHandler := NewLoginHandler(db)
+	loginHandler.ServeHTTP(response, request)
 
 	responseBody := string(response.Body.Bytes())
-	if responseBody == "invalid password" {
-		t.Fatalf(responseBody)
-	}
-
 	if response.Code != 200 {
-		t.Fatalf("non-expected status code %v:\n\tbody: %v", "200", response.Code)
+		t.Fatalf("non-expected status code: %d\nbody: %v", response.Code, responseBody)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
