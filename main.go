@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/oleksiivelychko/go-account/handlers"
@@ -9,10 +10,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 )
 
 func main() {
-	// initdb.LoadEnv() // uncomment for local development
+	//initdb.LoadEnv() // uncomment for local development
 
 	db, err := initdb.DB()
 	if err != nil {
@@ -32,8 +35,33 @@ func main() {
 		}
 	}(dbConnection)
 
-	http.HandleFunc("/api/account/register", handlers.RegisterHandler(db))
-	http.HandleFunc("/api/account/login", handlers.LoginHandler(db))
-	http.HandleFunc("/api/account/user", handlers.UserHandler(db))
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
+	serveMux := http.NewServeMux()
+	serveMux.Handle("/api/account/register/", handlers.NewRegisterHandler(db))
+	serveMux.Handle("/api/account/login/", handlers.NewLoginHandler(db))
+	serveMux.Handle("/api/account/user/", handlers.NewUserHandler(db))
+
+	server := &http.Server{
+		Addr:         ":" + os.Getenv("PORT"),
+		Handler:      serveMux,
+		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  1 * time.Second,
+		WriteTimeout: 1 * time.Second,
+	}
+
+	go func() {
+		err = server.ListenAndServe()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	signalChannel := make(chan os.Signal)
+	signal.Notify(signalChannel, os.Interrupt)
+	signal.Notify(signalChannel, os.Kill)
+
+	sig := <-signalChannel
+	log.Println("Received terminate, graceful shutdown", sig)
+
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	server.Shutdown(ctx)
 }
