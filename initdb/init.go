@@ -21,7 +21,7 @@ func LoadEnv() {
 	_ = os.Setenv("TEST_DB_NAME", "go-postgres-test")
 	_ = os.Setenv("TEST_DB_USER", "gopher")
 	_ = os.Setenv("TEST_DB_PASS", "secret")
-	_ = os.Setenv("APP_JWT_URL", "https://oleksiivelychkogojwtissuer.herokuapp.com")
+	_ = os.Setenv("APP_JWT_URL", "http://0.0.0.0:8080")
 }
 
 func DB() (*gorm.DB, error) {

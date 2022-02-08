@@ -9,7 +9,7 @@ Run tests sequentially with limit of the maximum number of test running in paral
 go clean -testcache && go test ./*/ -p 1
 ```
 
-Available .env variables with default values:
+Available next environment variables with default values:
 ```
 PORT=8081
 DB_LOG=enable
@@ -26,7 +26,10 @@ TEST_DB_PORT=5433
 TEST_DB_NAME=go-postgres-test
 TEST_DB_USER=gopher
 TEST_DB_PASS=secret
-APP_JWT_URL=https://oleksiivelychkogojwtissuer.herokuapp.com
+APP_JWT_URL=http://0.0.0.0:8080
 ```
+
+**P.S.** <a href="https://github.com/oleksiivelychko/go-jwt-issuer">JWT issuer</a> must be running before.
+Use `APP_JWT_URL=https://oleksiivelychkogojwtissuer.herokuapp.com` as remote backend service.
 
 ![how it works](.dock/readme.png)
