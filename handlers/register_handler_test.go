@@ -23,15 +23,12 @@ func TestRegisterHandler(t *testing.T) {
 	request, _ := http.NewRequest("POST", "/api/account/register", payload)
 	response := httptest.NewRecorder()
 
-	RegisterHandler(db)(response, request)
+	registerHandler := NewRegisterHandler(db)
+	registerHandler.ServeHTTP(response, request)
 
 	responseBody := string(response.Body.Bytes())
-	if responseBody == "email address already exists" {
-		t.Fatalf(responseBody)
-	}
-
 	if response.Code != 201 {
-		t.Fatalf("non-expected status code %v:\n\tbody: %v", "201", response.Code)
+		t.Fatalf("non-expected status code: %d\nbody: %v", response.Code, responseBody)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)

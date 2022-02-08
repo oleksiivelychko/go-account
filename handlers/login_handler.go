@@ -16,6 +16,7 @@ func NewLoginHandler(db *gorm.DB) *LoginHandler {
 	return &LoginHandler{db}
 }
 
+// type Handler interface
 func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		return
