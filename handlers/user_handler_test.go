@@ -35,7 +35,8 @@ func TestUserHandler(t *testing.T) {
 
 	response := httptest.NewRecorder()
 
-	UserHandler(db)(response, request)
+	userHandler := NewUserHandler(db)
+	userHandler.ServeHTTP(response, request)
 
 	if response.Code != 200 {
 		t.Fatalf("non-expected status code %v:\n\tbody: %v", "200", response.Code)
