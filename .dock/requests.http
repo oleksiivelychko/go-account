@@ -1,5 +1,5 @@
 ###
-POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/register
+POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/register/
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ###
-POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/login
+POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/login/
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ###
-POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/user
+POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/user/
 Content-Type: application/json
 Authorization: <access-token>
 Expires: <expiration-time>
