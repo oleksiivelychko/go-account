@@ -1,14 +1,5 @@
 ###
-POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/register/
-Content-Type: application/json
-
-{
-"email": "test@test.test",
-"password": "secret"
-}
-
-###
-POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/login/
+POST {{addr}}/api/account/register/
 Content-Type: application/json
 
 {
@@ -17,7 +8,16 @@ Content-Type: application/json
 }
 
 ###
-POST https://oleksiivelychkogoaccount.herokuapp.com/api/account/user/
+POST {{addr}}/api/account/login/
 Content-Type: application/json
-Authorization: <access-token>
-Expires: <expiration-time>
+
+{
+  "email": "test@test.test",
+  "password": "secret"
+}
+
+###
+POST {{addr}}/api/account/user/
+Content-Type: application/json
+Authorization: {{access-token}}
+Expires: {{expiration-time}}
