@@ -17,7 +17,8 @@ func NewRegisterHandler(db *gorm.DB) *RegisterHandler {
 
 // type Handler interface
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 

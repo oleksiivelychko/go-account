@@ -18,7 +18,8 @@ func NewLoginHandler(db *gorm.DB) *LoginHandler {
 
 // type Handler interface
 func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
