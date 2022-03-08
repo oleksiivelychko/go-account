@@ -22,6 +22,6 @@ TEST_DB_PASS=secret
 APP_JWT_URL=http://0.0.0.0:8080
 ```
 
-P.S <a href="https://github.com/oleksiivelychko/go-jwt-issuer">JWT issuer app</a> must be running before.
+💡 <a href="https://github.com/oleksiivelychko/go-jwt-issuer">JWT issuer app</a> must be running before.
 
 ![how it works](.http-requests/readme.png)
