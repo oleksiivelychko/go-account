@@ -1,6 +1,5 @@
 module github.com/oleksiivelychko/go-account
 
-// +heroku goVersion go1.16
 go 1.17
 
 require (
