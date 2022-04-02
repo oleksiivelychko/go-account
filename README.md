@@ -2,6 +2,8 @@
 
 ### Microservice provides API to manage users accounts including ACL through third-party JWT microservice.
 
+⚙️ Deployed on <a href="https://oleksiivelychkogoaccount.herokuapp.com">Heroku</a>
+
 There are available environment variables with default values:
 ```
 PORT=8081
