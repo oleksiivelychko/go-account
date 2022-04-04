@@ -6,6 +6,7 @@ go 1.17
 require (
 	github.com/badoux/checkmail v1.2.1
 	github.com/jinzhu/gorm v1.9.16
+	github.com/oleksiivelychko/go-helper v0.0.0-20220403045951-f3fd40772938
 	github.com/oleksiivelychko/go-jwt-issuer v0.0.0-20211207091922-e92d88abf554
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	gorm.io/driver/postgres v1.2.2

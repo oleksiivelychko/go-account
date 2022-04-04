@@ -1,7 +1,6 @@
 package initdb
 
 import (
-	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -11,12 +10,7 @@ import (
 	"time"
 )
 
-func Connection(host, user, pass, name, port, ssl, tz, logging string) (db *gorm.DB, err error) {
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-		host, user, pass, name, port, ssl, tz,
-	)
-
+func Connection(dsn, logging string) (db *gorm.DB, err error) {
 	if logging == "enable" {
 		currentTime := time.Now().UTC()
 		formatDate := currentTime.Format("01-02-2006")

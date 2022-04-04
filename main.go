@@ -7,6 +7,7 @@ import (
 	"github.com/oleksiivelychko/go-account/handlers"
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
+	"github.com/oleksiivelychko/go-helper/env"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +16,7 @@ import (
 )
 
 func main() {
-	//initdb.LoadEnv() // uncomment for local development
+	initdb.LoadEnv()
 
 	db, err := initdb.DB()
 	if err != nil {
@@ -41,7 +42,7 @@ func main() {
 	serveMux.Handle("/api/account/user/", handlers.NewUserHandler(db))
 
 	server := &http.Server{
-		Addr:         ":" + os.Getenv("PORT"),
+		Addr:         env.GetAddr(),
 		Handler:      serveMux,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
@@ -49,7 +50,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("Starting server on port %s", os.Getenv("PORT"))
+		log.Printf("Starting server on %s", env.GetAddr())
 		err = server.ListenAndServe()
 		if err != nil {
 			log.Fatal(err)

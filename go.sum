@@ -127,6 +127,8 @@ github.com/mattn/go-sqlite3 v1.14.0/go.mod h1:JIl7NbARA7phWnGvh0LKTyg7S9BA+6gx71
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=
 github.com/oleksiivelychko/go-helper v0.0.0-20211111054117-9aa512a7810b/go.mod h1:gOXquLGmt27EXdK4XR4bkgMLSyEqYPUGlFawIsgUbZE=
+github.com/oleksiivelychko/go-helper v0.0.0-20220403045951-f3fd40772938 h1:aG6HyuLTGYUuoifc8QDzpN2CP9M/dCdT2XOE01lmIlg=
+github.com/oleksiivelychko/go-helper v0.0.0-20220403045951-f3fd40772938/go.mod h1:1udeNPRTjJ0IVenT63zOPTBfailEQqj2zH9W0m+387M=
 github.com/oleksiivelychko/go-jwt-issuer v0.0.0-20211207091922-e92d88abf554 h1:1B8qksfsoW4+HUT1PY8XW9xeNbi2aZHopfVn4+dA6/Y=
 github.com/oleksiivelychko/go-jwt-issuer v0.0.0-20211207091922-e92d88abf554/go.mod h1:NcX1Zk+xF5MGaS8IMbgGePk8KzkyuI7KPLTIfjFMlYg=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

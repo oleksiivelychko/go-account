@@ -29,7 +29,7 @@ func TestExpiredAuthorizeTokenRequest(t *testing.T) {
 		t.Fatalf("access token request error: %s", err)
 	}
 
-	time.Sleep(61 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	_, err = AuthorizeTokenRequest(account)
 	if err != nil {

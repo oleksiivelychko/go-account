@@ -16,6 +16,7 @@ DB_PASS=secret
 DB_DRIVER=postgres
 DB_SSL=require
 DB_TZ=UTC
+DATABASE_URL=postgres://gopher:secret@host:port/go-postgres
 TEST_DB_HOST=localhost
 TEST_DB_PORT=5433
 TEST_DB_NAME=go-postgres-test

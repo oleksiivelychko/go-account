@@ -39,7 +39,7 @@ func TestUserHandler(t *testing.T) {
 	userHandler.ServeHTTP(response, request)
 
 	if response.Code != 200 {
-		t.Fatalf("non-expected status code %v:\n\tbody: %v", "200", response.Code)
+		t.Fatalf("non-expected status code %d", response.Code)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
