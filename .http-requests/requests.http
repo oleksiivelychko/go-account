@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ###
-POST {{addr}}/api/account/user/
+POST {{addr}}/api/account/user/?userId=1
 Content-Type: application/json
 Authorization: {{access-token}}
 Expires: {{expiration-time}}
