@@ -7,7 +7,9 @@ import (
 )
 
 func LoadEnv() {
-	if os.Getenv("HOST") == "" {
+	if host, isSet := os.LookupEnv("HOST"); isSet == true {
+		_ = os.Setenv("HOST", host)
+	} else {
 		_ = os.Setenv("HOST", "localhost")
 	}
 	if os.Getenv("PORT") == "" {
@@ -16,17 +18,19 @@ func LoadEnv() {
 	if os.Getenv("DB_LOG") == "" {
 		_ = os.Setenv("DB_LOG", "disable")
 	}
-	if os.Getenv("DB_HOST") == "" {
+	if host, isSet := os.LookupEnv("DB_HOST"); isSet == true {
+		_ = os.Setenv("DB_HOST", host)
+	} else {
 		_ = os.Setenv("DB_HOST", "localhost")
 	}
 	if os.Getenv("DB_PORT") == "" {
 		_ = os.Setenv("DB_PORT", "5432")
 	}
 	if os.Getenv("DB_NAME") == "" {
-		_ = os.Setenv("DB_NAME", "go-postgres")
+		_ = os.Setenv("DB_NAME", "account")
 	}
 	if os.Getenv("DB_USER") == "" {
-		_ = os.Setenv("DB_USER", "gopher")
+		_ = os.Setenv("DB_USER", "admin")
 	}
 	if os.Getenv("DB_PASS") == "" {
 		_ = os.Setenv("DB_PASS", "secret")
@@ -50,10 +54,10 @@ func LoadEnv() {
 		_ = os.Setenv("TEST_DB_PORT", "5433")
 	}
 	if os.Getenv("TEST_DB_NAME") == "" {
-		_ = os.Setenv("TEST_DB_NAME", "go-postgres-test")
+		_ = os.Setenv("TEST_DB_NAME", "account-test")
 	}
 	if os.Getenv("TEST_DB_USER") == "" {
-		_ = os.Setenv("TEST_DB_USER", "gopher")
+		_ = os.Setenv("TEST_DB_USER", "test")
 	}
 	if os.Getenv("TEST_DB_PASS") == "" {
 		_ = os.Setenv("TEST_DB_PASS", "secret")
