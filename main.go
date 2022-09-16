@@ -7,7 +7,6 @@ import (
 	"github.com/oleksiivelychko/go-account/handlers"
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
-	"github.com/oleksiivelychko/go-helper/env"
 	"log"
 	"net/http"
 	"os"
@@ -17,22 +16,23 @@ import (
 
 func main() {
 	initdb.LoadEnv()
+	addr := os.Getenv("HOST") + ":" + os.Getenv("PORT")
 
 	db, err := initdb.DB()
 	if err != nil {
-		log.Fatalf("failed database connection: %s", err)
+		log.Fatalf("Failed database connection: %s", err)
 	}
 
 	err = models.AutoMigrate(db)
 	if err != nil {
-		log.Fatalf("failed to migrate models: %s", err)
+		log.Fatalf("Failed to migrate models: %s", err)
 	}
 
 	dbConnection, err := db.DB()
 	defer func(sqlDB *sql.DB) {
 		err = sqlDB.Close()
 		if err != nil {
-			log.Fatalf("unable to close database connection: %s", err)
+			log.Fatalf("Unable to close database connection: %s", err)
 		}
 	}(dbConnection)
 
@@ -42,7 +42,7 @@ func main() {
 	serveMux.Handle("/api/account/user/", handlers.NewUserHandler(db))
 
 	server := &http.Server{
-		Addr:         env.GetAddr(),
+		Addr:         addr,
 		Handler:      serveMux,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("Starting server on %s", env.GetAddr())
+		log.Printf("Starting server on %s", addr)
 		err = server.ListenAndServe()
 		if err != nil {
 			log.Fatal(err)
@@ -65,5 +65,5 @@ func main() {
 	log.Println("Received terminate, graceful shutdown", sig)
 
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	server.Shutdown(ctx)
+	_ = server.Shutdown(ctx)
 }
