@@ -110,8 +110,6 @@ github.com/mattn/go-isatty v0.0.5/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hd
 github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mattn/go-sqlite3 v1.14.0/go.mod h1:JIl7NbARA7phWnGvh0LKTyg7S9BA+6gx71ShQilpsus=
-github.com/oleksiivelychko/go-helper v0.0.0-20220429045140-97947692be50 h1:JeyOMXAy3SaSWpWGsk7MXoFwMKRNMf1U6iyksTnPdDk=
-github.com/oleksiivelychko/go-helper v0.0.0-20220429045140-97947692be50/go.mod h1:1udeNPRTjJ0IVenT63zOPTBfailEQqj2zH9W0m+387M=
 github.com/oleksiivelychko/go-jwt-issuer v0.0.0-20220915051626-0540791495a8 h1:a5vUBcUVgdDNkwlHy+mvuYFMiO5I7hRUMq+zKp9S0vg=
 github.com/oleksiivelychko/go-jwt-issuer v0.0.0-20220915051626-0540791495a8/go.mod h1:hQIuI1MPqE9OBfFCVXL/JX07CfEKXjE4sUoEyWcxGng=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=

@@ -1,11 +1,10 @@
 module github.com/oleksiivelychko/go-account
 
-go 1.18
+go 1.19
 
 require (
 	github.com/badoux/checkmail v1.2.1
 	github.com/jinzhu/gorm v1.9.16
-	github.com/oleksiivelychko/go-helper v0.0.0-20220429045140-97947692be50
 	github.com/oleksiivelychko/go-jwt-issuer v0.0.0-20220915051626-0540791495a8
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 	gorm.io/driver/postgres v1.3.9
