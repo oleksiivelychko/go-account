@@ -44,9 +44,6 @@ func LoadEnv() {
 	if os.Getenv("DB_TZ") == "" {
 		_ = os.Setenv("DB_TZ", "UTC")
 	}
-	if os.Getenv("DATABASE_URL") == "" {
-		_ = os.Setenv("DATABASE_URL", "postgres://gopher:secret@localhost:5432/go-postgres")
-	}
 	if os.Getenv("TEST_DB_HOST") == "" {
 		_ = os.Setenv("TEST_DB_HOST", "localhost")
 	}
@@ -68,6 +65,7 @@ func LoadEnv() {
 }
 
 func DB() (*gorm.DB, error) {
+	// DATABASE_URL=postgres://admin:secret@localhost:5432/account
 	var dsn = os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		dsn = fmt.Sprintf(
