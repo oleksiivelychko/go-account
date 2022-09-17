@@ -19,12 +19,9 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 }
 
 func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	tokenHeader := r.Header.Get("Authorization")
-	expirationTime := r.Header.Get("Expires")
-
 	accountSerialized := &models.AccountSerialized{
-		AccessToken:    tokenHeader,
-		ExpirationTime: expirationTime,
+		AccessToken:    r.Header.Get("Authorization"),
+		ExpirationTime: r.Header.Get("Expires"),
 	}
 
 	accountSerialized, err := requests.AuthorizeTokenRequest(accountSerialized)

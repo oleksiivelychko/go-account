@@ -35,16 +35,16 @@ func initTest() (*gorm.DB, error) {
 func TestLoginHandler(t *testing.T) {
 	db, _ := initTest()
 
-	accountRepository := models.AccountRepository{DB: db, Debug: false}
-	_, _ = accountRepository.Create(&models.Account{
-		Email:    "test@test.test",
-		Password: "secret",
-	})
-
 	inputAccount := &models.Account{
 		Email:    "test@test.test",
 		Password: "secret",
 	}
+
+	accountRepository := models.AccountRepository{DB: db, Debug: false}
+	_, _ = accountRepository.Create(&models.Account{
+		Email:    inputAccount.Email,
+		Password: inputAccount.Password,
+	})
 
 	payload := new(bytes.Buffer)
 	_ = json.NewEncoder(payload).Encode(inputAccount)
