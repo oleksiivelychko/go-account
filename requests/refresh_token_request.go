@@ -9,13 +9,9 @@ import (
 )
 
 func RefreshTokenRequest(accountSerialized *models.AccountSerialized) (*models.AccountSerialized, error) {
-	apiAccessTokenUrl := os.Getenv("APP_JWT_URL")
-	if apiAccessTokenUrl == "" {
-		return accountSerialized, fmt.Errorf("APP_JWT_URL is not set")
-	}
-
 	client := http.Client{}
-	request, err := http.NewRequest("POST", apiAccessTokenUrl+"/refresh-token/", nil)
+	apiRequestUrl := fmt.Sprintf("%s/refresh-token", os.Getenv("APP_JWT_URL"))
+	request, err := http.NewRequest("POST", apiRequestUrl, nil)
 	if err != nil {
 		return accountSerialized, err
 	}
