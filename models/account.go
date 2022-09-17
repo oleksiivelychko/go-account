@@ -31,7 +31,7 @@ type AccountSerialized struct {
 	RefreshToken   string           `json:"refresh_token,omitempty"`
 	ExpirationTime string           `json:"expiration_time,omitempty"`
 	ErrorMessage   string           `json:"error_message,omitempty"`
-	ErrorCode      int              `json:"error_code,omitempty"`
+	ErrorCode      uint8            `json:"error_code,omitempty"`
 }
 
 func (model *Account) VerifyPassword(password string) error {
