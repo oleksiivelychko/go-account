@@ -14,7 +14,7 @@ func AccessTokenRequest(accountSerialized *models.AccountSerialized) (*models.Ac
 		return accountSerialized, fmt.Errorf("APP_JWT_URL is not set")
 	}
 
-	var apiRequestUrl = fmt.Sprintf("%s/access-token/?userId=%d", apiAccessTokenUrl, accountSerialized.ID)
+	var apiRequestUrl = fmt.Sprintf("%s/access-token?userId=%d", apiAccessTokenUrl, accountSerialized.ID)
 	response, err := http.Get(apiRequestUrl)
 	if err != nil {
 		return accountSerialized, fmt.Errorf("unable to make request to `%s`", apiRequestUrl)
