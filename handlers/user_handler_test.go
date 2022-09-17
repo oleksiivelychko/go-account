@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/requests"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -42,7 +42,7 @@ func TestUserHandler(t *testing.T) {
 		t.Fatalf("non-expected status code %d", response.Code)
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
