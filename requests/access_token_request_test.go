@@ -15,12 +15,12 @@ func TestAccessTokenRequest(t *testing.T) {
 	}
 
 	if account.AccessToken == "" {
-		t.Fatalf("got empty `access-token`")
+		t.Fatalf("got empty `access_token`")
 	}
 	if account.RefreshToken == "" {
-		t.Fatalf("got empty `refresh-token`")
+		t.Fatalf("got empty `refresh_token`")
 	}
 	if account.ExpirationTime == "" {
-		t.Fatalf("got empty `expiration-time`")
+		t.Fatalf("got empty `expiration_time`")
 	}
 }
