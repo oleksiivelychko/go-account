@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/models"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,7 +31,7 @@ func TestRegisterHandler(t *testing.T) {
 		t.Fatalf("non-expected status code: %d\nbody: %v", response.Code, responseBody)
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
