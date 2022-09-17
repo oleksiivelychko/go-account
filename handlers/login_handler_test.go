@@ -6,7 +6,7 @@ import (
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
 	"gorm.io/gorm"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -60,7 +60,7 @@ func TestLoginHandler(t *testing.T) {
 		t.Fatalf("non-expected status code: %d\nbody: %v", response.Code, responseBody)
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
@@ -76,14 +76,14 @@ func TestLoginHandler(t *testing.T) {
 	}
 
 	if loggedAccount.AccessToken == "" {
-		t.Fatalf("got empty `access-token`")
+		t.Fatalf("got empty `access_token`")
 	}
 
 	if loggedAccount.RefreshToken == "" {
-		t.Fatalf("got empty `refresh-token`")
+		t.Fatalf("got empty `refresh_token`")
 	}
 
 	if loggedAccount.ExpirationTime == "" {
-		t.Fatalf("got empty `expiration-time`")
+		t.Fatalf("got empty `expiration_time`")
 	}
 }
