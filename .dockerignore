@@ -1,7 +1,10 @@
 .idea
-.dock
+.docker_postgres
 .kube
+logs
 .gitignore
 docker-compose.yml
 Makefile
 README.md
+requests.http
+social_preview.png
