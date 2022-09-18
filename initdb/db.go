@@ -7,31 +7,32 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
 func Connection(dsn, logging string) (db *gorm.DB, err error) {
 	if logging == "enable" {
 		currentTime := time.Now().UTC()
-		formatDate := currentTime.Format("01-02-2006")
+		formatDate := currentTime.Format("02-01-2006")
+
+		logPath := filepath.Join(".", "logs")
+		_ = os.Mkdir(logPath, 0755)
 
 		var f *os.File
-		f, err = os.OpenFile("docker/logs/gorm_"+formatDate+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		f, err = os.OpenFile("./logs/gorm_"+formatDate+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 		if err != nil {
-			f, err = os.OpenFile("../docker/logs/gorm_"+formatDate+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-			if err != nil {
-				return
-			}
+			log.Fatalf(err.Error())
 		}
 
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-			// log to console and file
+			// To log into console add `os.Stdout` as argument to `io.MultiWriter` function.
 			Logger: logger.New(
-				log.New(io.MultiWriter(os.Stdout, f), "\r\n", log.LstdFlags), // io writer
+				log.New(io.MultiWriter(f), "\r\n", log.LstdFlags), // io writer
 				logger.Config{
 					SlowThreshold:             time.Second,   // Slow SQL threshold
 					LogLevel:                  logger.Silent, // Log level
-					IgnoreRecordNotFoundError: false,         // Ignore ErrRecordNotFound error for logger
+					IgnoreRecordNotFoundError: false,         // Don't ignore ErrRecordNotFound error
 					Colorful:                  false,         // Disable color
 				},
 			),
