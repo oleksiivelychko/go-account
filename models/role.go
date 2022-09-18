@@ -139,7 +139,7 @@ func (rr *RoleRepository) FindOneByName(name string) (role *Role, err error) {
 	}
 
 	if err != nil {
-		return role, fmt.Errorf("role `%s` doesn't managed to find: %s", name, err)
+		return role, fmt.Errorf("role '%s' doesn't managed to find: %s", name, err)
 	}
 	return role, nil
 }

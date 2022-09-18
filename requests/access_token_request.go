@@ -12,7 +12,7 @@ func AccessTokenRequest(accountSerialized *models.AccountSerialized) (*models.Ac
 	apiRequestUrl := fmt.Sprintf("%s/access-token?userId=%d", os.Getenv("APP_JWT_URL"), accountSerialized.ID)
 	response, err := http.Get(apiRequestUrl)
 	if err != nil {
-		return accountSerialized, fmt.Errorf("unable to make request to `%s`", apiRequestUrl)
+		return accountSerialized, fmt.Errorf("unable to make request to '%s'.\n%s", apiRequestUrl, err.Error())
 	}
 
 	if response.StatusCode != 201 {
