@@ -8,8 +8,8 @@ RUN go mod download
 
 COPY ./ ./
 
-RUN go build -o /app
+RUN go build -o /app/go-account
 
 EXPOSE 8080
 
-CMD ["/app"]
+CMD ["/app/go-account"]
