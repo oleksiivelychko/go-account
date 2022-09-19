@@ -2,7 +2,7 @@
 
 ### Microservice provides API to manage users accounts including ACL, enhanced by third-party JWT microservice.
 
-There are available environment variables with default values:
+📌 There are available environment variables with default values:
 ```
 HOST=localhost
 PORT=8081
