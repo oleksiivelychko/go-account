@@ -1,30 +1,33 @@
 # go-account
 
-### Microservice provides API to manage users accounts including ACL through third-party JWT microservice.
-
-⚙️ Deployed on <a href="https://oleksiivelychkogoaccount.herokuapp.com">Heroku</a>
+### Microservice provides API to manage users accounts including ACL, enhanced by third-party JWT microservice.
 
 There are available environment variables with default values:
 ```
+HOST=localhost
 PORT=8081
-DB_LOG=enable
+DB_LOG=disable
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=go-postgres
-DB_USER=gopher
+DB_NAME=account
+DB_USER=admin
 DB_PASS=secret
 DB_DRIVER=postgres
-DB_SSL=require
+DB_SSL=disable
 DB_TZ=UTC
-DATABASE_URL=postgres://gopher:secret@localhost:5432/go-postgres
 TEST_DB_HOST=localhost
 TEST_DB_PORT=5433
-TEST_DB_NAME=go-postgres-test
-TEST_DB_USER=gopher
+TEST_DB_NAME=account-test
+TEST_DB_USER=test
 TEST_DB_PASS=secret
-APP_JWT_URL=http://0.0.0.0:8080
+APP_JWT_URL=http://localhost:8080
+```
+
+💡 Watch logs of app for single pod:
+```
+kubectl exec goaccount-pod-0 -n gons -- tail -f /app/logs/gorm_$(date +%d-%m-%Y).log -n 100
 ```
 
 💡 <a href="https://github.com/oleksiivelychko/go-jwt-issuer">JWT issuer app</a> must be running before.
 
-![how it works](.http-requests/readme.png)
+![How it works](social_preview.png)
