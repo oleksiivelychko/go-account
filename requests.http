@@ -1,0 +1,28 @@
+### Register a new user.
+POST http://127.0.0.1:30000/api/account/register/
+Content-Type: application/json
+
+{
+  "email": "test@test.test",
+  "password": "secret"
+}
+
+### Login as registered user.
+POST http://127.0.0.1:30000/api/account/login/
+Content-Type: application/json
+
+{
+  "email": "test@test.test",
+  "password": "secret"
+}
+
+> {%
+    client.global.set("access_token", response.body.access_token);
+    client.global.set("expiration_time", response.body.expiration_time);
+%}
+
+### Try to request user private data.
+POST http://127.0.0.1:30000/api/account/user/?userId=1
+Content-Type: application/json
+Authorization: {{access_token}}
+Expires: {{expiration_time}}
