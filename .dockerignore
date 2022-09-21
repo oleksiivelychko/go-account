@@ -3,6 +3,7 @@
 .kube
 logs
 .gitignore
+LICENSE
 docker-compose.yml
 Makefile
 README.md
