@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/oleksiivelychko/go-account/models"
+	"github.com/oleksiivelychko/go-account/repositories"
 	"github.com/oleksiivelychko/go-account/requests"
+	"github.com/oleksiivelychko/go-account/services"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,11 +16,13 @@ import (
 func TestUserHandler(t *testing.T) {
 	db, _ := initTest()
 
-	accountRepository := models.AccountRepository{DB: db, Debug: false}
+	accountRepository := repositories.NewAccountRepository(db, false)
 	createdAccount, _ := accountRepository.Create(&models.Account{
 		Email:    "test@test.test",
 		Password: "secret",
 	})
+
+	accountService := services.NewAccountService(accountRepository)
 
 	accountSerialized, err := requests.AccessTokenRequest(&models.AccountSerialized{ID: createdAccount.ID})
 	if err != nil {
@@ -35,7 +39,7 @@ func TestUserHandler(t *testing.T) {
 
 	response := httptest.NewRecorder()
 
-	userHandler := NewUserHandler(db)
+	userHandler := NewUserHandler(accountService)
 	userHandler.ServeHTTP(response, request)
 
 	if response.Code != 200 {
@@ -54,11 +58,11 @@ func TestUserHandler(t *testing.T) {
 	}
 
 	if account.Email != account.Email {
-		t.Fatalf("emails doesn's match")
+		t.Fatalf("email mismatch")
 	}
 
-	verifiedPassword := account.VerifyPassword("secret")
-	if verifiedPassword != nil {
-		t.Errorf("[func (model *Account) VerifyPassword(password string) error] -> %s", verifiedPassword)
+	verifiedPasswordErr := accountService.VerifyPassword(account, "secret")
+	if verifiedPasswordErr != nil {
+		t.Errorf("unable to verify password: %s", verifiedPasswordErr)
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
+	"github.com/oleksiivelychko/go-account/repositories"
+	"github.com/oleksiivelychko/go-account/services"
 	"gorm.io/gorm"
 	"io"
 	"net/http"
@@ -40,11 +42,16 @@ func TestLoginHandler(t *testing.T) {
 		Password: "secret",
 	}
 
-	accountRepository := models.AccountRepository{DB: db, Debug: false}
-	_, _ = accountRepository.Create(&models.Account{
+	accountRepository := repositories.NewAccountRepository(db, false)
+	accountService := services.NewAccountService(accountRepository)
+
+	inputAccount, err := accountService.Create(&models.Account{
 		Email:    inputAccount.Email,
 		Password: inputAccount.Password,
 	})
+	if err != nil {
+		t.Fatalf("unable to create account: %s", err)
+	}
 
 	payload := new(bytes.Buffer)
 	_ = json.NewEncoder(payload).Encode(inputAccount)
@@ -52,7 +59,7 @@ func TestLoginHandler(t *testing.T) {
 	request, _ := http.NewRequest("POST", "/api/account/login", payload)
 	response := httptest.NewRecorder()
 
-	loginHandler := NewLoginHandler(db)
+	loginHandler := NewLoginHandler(accountService)
 	loginHandler.ServeHTTP(response, request)
 
 	responseBody := string(response.Body.Bytes())
@@ -72,7 +79,7 @@ func TestLoginHandler(t *testing.T) {
 	}
 
 	if loggedAccount.Email != inputAccount.Email {
-		t.Fatalf("emails doesn's match")
+		t.Fatalf("email mismatch")
 	}
 
 	if loggedAccount.AccessToken == "" {

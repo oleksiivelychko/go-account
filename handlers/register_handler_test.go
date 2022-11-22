@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/models"
+	"github.com/oleksiivelychko/go-account/repositories"
+	"github.com/oleksiivelychko/go-account/services"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -23,7 +25,12 @@ func TestRegisterHandler(t *testing.T) {
 	request, _ := http.NewRequest("POST", "/api/account/register", payload)
 	response := httptest.NewRecorder()
 
-	registerHandler := NewRegisterHandler(db)
+	accountRepository := repositories.NewAccountRepository(db, false)
+	roleRepository := repositories.NewRoleRepository(db, false)
+	accountService := services.NewAccountService(accountRepository)
+	roleService := services.NewRoleService(roleRepository)
+
+	registerHandler := NewRegisterHandler(accountService, roleService)
 	registerHandler.ServeHTTP(response, request)
 
 	responseBody := string(response.Body.Bytes())
@@ -43,10 +50,10 @@ func TestRegisterHandler(t *testing.T) {
 	}
 
 	if newAccount.Email != inputAccount.Email {
-		t.Fatalf("emails doesn's match")
+		t.Fatalf("email mismatch")
 	}
 
-	if newAccount.VerifyPassword(inputAccount.Password) != nil {
-		t.Fatalf("passwords doesn't match")
+	if accountService.VerifyPassword(inputAccount, inputAccount.Password) != nil {
+		t.Fatalf("password mismatch")
 	}
 }
