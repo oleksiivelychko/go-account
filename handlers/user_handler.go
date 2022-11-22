@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/requests"
-	"gorm.io/gorm"
+	"github.com/oleksiivelychko/go-account/services"
 	"net/http"
 	"strconv"
 )
 
 type UserHandler struct {
-	db *gorm.DB
+	accountService *services.AccountService
 }
 
-func NewUserHandler(db *gorm.DB) *UserHandler {
-	return &UserHandler{db}
+func NewUserHandler(s *services.AccountService) *UserHandler {
+	return &UserHandler{s}
 }
 
-func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (handler *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	accountSerialized := &models.AccountSerialized{
 		AccessToken:    r.Header.Get("Authorization"),
 		ExpirationTime: r.Header.Get("Expires"),
@@ -39,8 +39,7 @@ func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountRepository := models.AccountRepository{DB: h.db, Debug: false}
-	account, err := accountRepository.FindOneByID(uint(userID))
+	account, err := handler.accountService.GetRepository().FindOneByID(uint(userID))
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))

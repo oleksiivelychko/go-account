@@ -4,20 +4,20 @@ import (
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/requests"
-	"gorm.io/gorm"
+	"github.com/oleksiivelychko/go-account/services"
 	"net/http"
 )
 
 type LoginHandler struct {
-	db *gorm.DB
+	accountService *services.AccountService
 }
 
-func NewLoginHandler(db *gorm.DB) *LoginHandler {
-	return &LoginHandler{db}
+func NewLoginHandler(s *services.AccountService) *LoginHandler {
+	return &LoginHandler{s}
 }
 
 // type Handler interface
-func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (handler *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -32,9 +32,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountRepository := models.AccountRepository{DB: h.db, Debug: false}
-	account, err := accountRepository.MakeAuth(inputAccount.Email, inputAccount.Password)
-
+	account, err := handler.accountService.Auth(inputAccount.Email, inputAccount.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))

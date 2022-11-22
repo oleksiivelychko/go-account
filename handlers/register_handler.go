@@ -3,20 +3,20 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/models"
-	"gorm.io/gorm"
+	"github.com/oleksiivelychko/go-account/services"
 	"net/http"
 )
 
 type RegisterHandler struct {
-	db *gorm.DB
+	accountService *services.AccountService
+	roleService    *services.RoleService
 }
 
-func NewRegisterHandler(db *gorm.DB) *RegisterHandler {
-	return &RegisterHandler{db}
+func NewRegisterHandler(a *services.AccountService, r *services.RoleService) *RegisterHandler {
+	return &RegisterHandler{a, r}
 }
 
-// type Handler interface
-func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (handler *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -31,13 +31,11 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roleRepository := models.RoleRepository{DB: h.db, Debug: false}
 	var roles []models.Role
-	role, err := roleRepository.FindOneByNameOrCreate("user")
+	role, err := handler.roleService.FindOneByNameOrCreate("user")
 	roles = append(roles, *role)
 
-	accountRepository := models.AccountRepository{DB: h.db, Debug: false}
-	account, err := accountRepository.Create(&models.Account{
+	account, err := handler.accountService.Create(&models.Account{
 		Email:    inputAccount.Email,
 		Password: inputAccount.Password,
 		Roles:    roles,
