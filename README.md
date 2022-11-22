@@ -28,6 +28,6 @@ APP_JWT_URL=http://localhost:8080
 kubectl exec goaccount-pod-0 -n gons -- tail -f /app/logs/gorm_$(date +%d-%m-%Y).log -n 100
 ```
 
-💡 <a href="https://github.com/oleksiivelychko/go-jwt-issuer">JWT issuer app</a> must be running before.
+⚠️ <a href="https://github.com/oleksiivelychko/go-jwt-issuer">JWT issuer app</a> must be running before.
 
 ![How it works](social_preview.png)

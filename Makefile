@@ -1,6 +1,5 @@
 go-test:
 	$(info Run tests sequentially with limit of the maximum number of test running in parallel.)
-	$(warning oleksiivelychko/go-jwt-issuer application must be running before.)
 	go clean -testcache && go test ./*/ -p 1
 
 docker-build:
