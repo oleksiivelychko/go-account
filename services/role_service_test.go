@@ -1,21 +1,22 @@
-package models
+package services
 
 import (
+	"github.com/oleksiivelychko/go-account/initdb"
+	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
-	"github.com/oleksiivelychko/go-account/services"
 	"testing"
 )
 
 func TestCreateRole(t *testing.T) {
-	db, err := initTest()
+	db, err := initdb.TestPrepare()
 	if err != nil {
 		t.Errorf("initialization test environment error: %s", err)
 	}
 
 	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := services.NewRoleService(roleRepository)
+	roleService := NewRoleService(roleRepository)
 
-	createdRole, err := roleService.Create(&Role{Name: "guest"})
+	createdRole, err := roleService.Create(&models.Role{Name: "guest"})
 
 	if err != nil {
 		t.Errorf("unable to create role model: %s", err)
@@ -27,15 +28,15 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestUpdateRole(t *testing.T) {
-	db, err := initTest()
+	db, err := initdb.TestPrepare()
 	if err != nil {
 		t.Errorf("initialization test environment error: %s", err)
 	}
 
 	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := services.NewRoleService(roleRepository)
+	roleService := NewRoleService(roleRepository)
 
-	role, err := roleService.Create(&Role{Name: "guest"})
+	role, err := roleService.Create(&models.Role{Name: "guest"})
 	role.Name = "user"
 
 	updatedRole, err := roleService.Update(role)
@@ -49,15 +50,15 @@ func TestUpdateRole(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	db, err := initTest()
+	db, err := initdb.TestPrepare()
 	if err != nil {
 		t.Errorf("initialization test environment error: %s", err)
 	}
 
 	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := services.NewRoleService(roleRepository)
+	roleService := NewRoleService(roleRepository)
 
-	role, err := roleService.Create(&Role{Name: "guest"})
+	role, err := roleService.Create(&models.Role{Name: "guest"})
 
 	rowsAffected, err := roleRepository.Delete(role)
 	if err != nil && rowsAffected == 0 {
