@@ -21,7 +21,7 @@ Content-Type: application/json
     client.global.set("expiration_time", response.body.expiration_time);
 %}
 
-### Try to request user private data.
+### Try to request the user private data.
 POST http://127.0.0.1:30000/api/account/user/?userId=1
 Content-Type: application/json
 Authorization: {{access_token}}
