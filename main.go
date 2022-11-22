@@ -7,6 +7,8 @@ import (
 	"github.com/oleksiivelychko/go-account/handlers"
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
+	"github.com/oleksiivelychko/go-account/repositories"
+	"github.com/oleksiivelychko/go-account/services"
 	"log"
 	"net/http"
 	"os"
@@ -20,26 +22,31 @@ func main() {
 
 	db, err := initdb.DB()
 	if err != nil {
-		log.Fatalf("Failed database connection: %s", err)
+		log.Fatalf("failed database connection: %s", err)
 	}
 
 	err = models.AutoMigrate(db)
 	if err != nil {
-		log.Fatalf("Failed to migrate models: %s", err)
+		log.Fatalf("failed to migrate models: %s", err)
 	}
 
 	dbConnection, err := db.DB()
 	defer func(sqlDB *sql.DB) {
 		err = sqlDB.Close()
 		if err != nil {
-			log.Fatalf("Unable to close database connection: %s", err)
+			log.Fatalf("unable to close database connection: %s", err)
 		}
 	}(dbConnection)
 
+	accountRepository := repositories.NewAccountRepository(db, true)
+	accountService := services.NewAccountService(accountRepository)
+	roleRepository := repositories.NewRoleRepository(db, true)
+	roleService := services.NewRoleService(roleRepository)
+
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/api/account/register/", handlers.NewRegisterHandler(db))
-	serveMux.Handle("/api/account/login/", handlers.NewLoginHandler(db))
-	serveMux.Handle("/api/account/user/", handlers.NewUserHandler(db))
+	serveMux.Handle("/api/account/register/", handlers.NewRegisterHandler(accountService, roleService))
+	serveMux.Handle("/api/account/login/", handlers.NewLoginHandler(accountService))
+	serveMux.Handle("/api/account/user/", handlers.NewUserHandler(accountService))
 
 	server := &http.Server{
 		Addr:         addr,
@@ -50,7 +57,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("Starting server on %s", addr)
+		log.Printf("starting server on %s", addr)
 		err = server.ListenAndServe()
 		if err != nil {
 			log.Fatal(err)
@@ -62,8 +69,10 @@ func main() {
 	signal.Notify(signalChannel, os.Kill)
 
 	sig := <-signalChannel
-	log.Println("Received terminate, graceful shutdown", sig)
+	log.Println("received terminate, graceful shutdown", sig)
 
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
 	_ = server.Shutdown(ctx)
 }
