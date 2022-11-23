@@ -6,7 +6,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/oleksiivelychko/go-account/handlers"
 	"github.com/oleksiivelychko/go-account/initdb"
-	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
 	"github.com/oleksiivelychko/go-account/services"
 	"log"
@@ -25,9 +24,9 @@ func main() {
 		log.Fatalf("failed database connection: %s", err)
 	}
 
-	err = models.AutoMigrate(db)
+	err = initdb.AutoMigrate(db)
 	if err != nil {
-		log.Fatalf("failed to migrate models: %s", err)
+		log.Fatalf("failed to run migrations: %s", err)
 	}
 
 	dbConnection, err := db.DB()
