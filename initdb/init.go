@@ -96,3 +96,23 @@ func TestDB() (*gorm.DB, error) {
 	)
 	return Connection(dsn, os.Getenv("DB_LOG"))
 }
+
+func TestPrepare() (*gorm.DB, error) {
+	LoadEnv()
+	db, err := TestDB()
+	err = AutoMigrate(db)
+
+	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
+	sqlExec := db.Exec(statement)
+	if sqlExec.Error != nil {
+		return nil, sqlExec.Error
+	}
+
+	statement = "TRUNCATE roles RESTART IDENTITY CASCADE"
+	sqlExec = db.Exec(statement)
+	if sqlExec.Error != nil {
+		return nil, sqlExec.Error
+	}
+
+	return db, err
+}
