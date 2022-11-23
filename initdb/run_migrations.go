@@ -1,6 +1,7 @@
-package models
+package initdb
 
 import (
+	"github.com/oleksiivelychko/go-account/models"
 	"gorm.io/gorm"
 	"os"
 )
@@ -8,13 +9,13 @@ import (
 func AutoMigrate(db *gorm.DB) error {
 	if os.Getenv("DB_LOG") == "enable" {
 		return db.Debug().AutoMigrate(
-			&Account{},
-			&Role{},
+			&models.Account{},
+			&models.Role{},
 		)
 	} else {
 		return db.AutoMigrate(
-			&Account{},
-			&Role{},
+			&models.Account{},
+			&models.Role{},
 		)
 	}
 }
