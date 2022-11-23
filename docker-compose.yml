@@ -4,14 +4,14 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:14-alpine
+    image: postgres:15.1-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-admin}
       POSTGRES_PASSWORD: ${DB_PASS:-secret}
       POSTGRES_DB: ${DB_NAME:-account}
     volumes:
-      - ./.docker_postgres/data:/var/lib/postgresql/data˚
+      - ./.docker_postgres/data:/var/lib/postgresql
     ports:
       - ${DB_PORT:-5432}:5432
     networks:
@@ -19,14 +19,14 @@ services:
 
   postgres-test:
     container_name: postgres_test
-    image: postgres:14-alpine
+    image: postgres:15.1-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${TEST_DB_USER:-test}
       POSTGRES_PASSWORD: ${TEST_DB_PASS:-secret}
       POSTGRES_DB: ${TEST_DB_NAME:-account-test}
     volumes:
-      - ./.docker_postgres/data_test:/var/lib/postgresql/data
+      - ./.docker_postgres/data_test:/var/lib/postgresql
     ports:
       - ${TEST_DB_PORT:-5433}:5432
     networks:
