@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
 	"github.com/oleksiivelychko/go-account/requests"
@@ -14,7 +15,10 @@ import (
 )
 
 func TestUserHandler(t *testing.T) {
-	db, _ := initTest()
+	db, err := initdb.TestPrepare()
+	if err != nil {
+		t.Errorf("initialization test environment error: %s", err)
+	}
 
 	accountRepository := repositories.NewAccountRepository(db, false)
 	createdAccount, _ := accountRepository.Create(&models.Account{

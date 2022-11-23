@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
 	"github.com/oleksiivelychko/go-account/services"
@@ -13,7 +14,10 @@ import (
 )
 
 func TestRegisterHandler(t *testing.T) {
-	db, _ := initTest()
+	db, err := initdb.TestPrepare()
+	if err != nil {
+		t.Errorf("initialization test environment error: %s", err)
+	}
 
 	inputAccount := &models.Account{
 		Email:    "test@test.test",

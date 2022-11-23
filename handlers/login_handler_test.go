@@ -7,35 +7,17 @@ import (
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
 	"github.com/oleksiivelychko/go-account/services"
-	"gorm.io/gorm"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func initTest() (*gorm.DB, error) {
-	initdb.LoadEnv()
-	db, err := initdb.TestDB()
-	err = models.AutoMigrate(db)
-
-	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
-	sqlExec := db.Exec(statement)
-	if sqlExec.Error != nil {
-		return nil, sqlExec.Error
-	}
-
-	statement = "TRUNCATE roles RESTART IDENTITY CASCADE"
-	sqlExec = db.Exec(statement)
-	if sqlExec.Error != nil {
-		return nil, sqlExec.Error
-	}
-
-	return db, err
-}
-
 func TestLoginHandler(t *testing.T) {
-	db, _ := initTest()
+	db, err := initdb.TestPrepare()
+	if err != nil {
+		t.Errorf("initialization test environment error: %s", err)
+	}
 
 	inputAccount := &models.Account{
 		Email:    "test@test.test",
@@ -45,7 +27,7 @@ func TestLoginHandler(t *testing.T) {
 	accountRepository := repositories.NewAccountRepository(db, false)
 	accountService := services.NewAccountService(accountRepository)
 
-	inputAccount, err := accountService.Create(&models.Account{
+	inputAccount, err = accountService.Create(&models.Account{
 		Email:    inputAccount.Email,
 		Password: inputAccount.Password,
 	})
