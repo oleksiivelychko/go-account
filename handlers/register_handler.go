@@ -25,9 +25,11 @@ func (handler *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 
 	var inputAccount models.Account
+
 	err := json.NewDecoder(r.Body).Decode(&inputAccount)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -48,5 +50,5 @@ func (handler *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(account)
+	_ = json.NewEncoder(w).Encode(handler.accountService.Serialize(account))
 }
