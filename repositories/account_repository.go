@@ -73,9 +73,9 @@ func (ar *AccountRepository) Delete(modelAccount *models.Account) (int64, error)
 
 func (ar *AccountRepository) FindAll() (modelsAccount *[]models.Account, err error) {
 	if ar.Repo.Debug {
-		err = ar.Repo.DB.Debug().Find(&modelsAccount).Error
+		err = ar.Repo.DB.Debug().Preload("Roles").Find(&modelsAccount).Error
 	} else {
-		err = ar.Repo.DB.Find(&modelsAccount).Error
+		err = ar.Repo.DB.Preload("Roles").Find(&modelsAccount).Preload("Roles").Error
 	}
 
 	return modelsAccount, err
@@ -89,7 +89,7 @@ func (ar *AccountRepository) FindOneByID(id uint) (modelAccount *models.Account,
 	}
 
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("account not found: %s", err)
+		return nil, fmt.Errorf("unable to find account %d: %s", id, err)
 	}
 
 	return modelAccount, err
@@ -118,7 +118,7 @@ func (ar *AccountRepository) FindOneByEmail(email string, withRoles bool) (*mode
 	return modelAccount, db.Error
 }
 
-func (ar *AccountRepository) AddRoles(modelAccount *models.Account, roles []models.Role) (*models.Account, error) {
+func (ar *AccountRepository) AddRoles(modelAccount *models.Account, roles []*models.Role) (*models.Account, error) {
 	var err error
 
 	if ar.Repo.Debug {
