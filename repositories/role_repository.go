@@ -7,62 +7,50 @@ import (
 )
 
 type RoleRepository struct {
-	DB    *gorm.DB
-	Debug bool
+	Repo *Repository
 }
 
-func NewRoleRepository(db *gorm.DB, debug bool) *RoleRepository {
-	return &RoleRepository{db, debug}
+func NewRoleRepository(repo *Repository) *RoleRepository {
+	return &RoleRepository{Repo: repo}
 }
 
-func (repository *RoleRepository) Create(role *models.Role) (*models.Role, error) {
-	var err error
-
-	if repository.Debug {
-		err = repository.DB.Debug().Create(&role).Error
+func (repository *RoleRepository) Create(modelRole *models.Role) (err error) {
+	if repository.Repo.Debug {
+		err = repository.Repo.DB.Debug().Create(&modelRole).Error
 	} else {
-		err = repository.DB.Create(&role).Error
+		err = repository.Repo.DB.Create(&modelRole).Error
+	}
+
+	return err
+}
+
+func (repository *RoleRepository) Update(modelRole *models.Role, data map[string]interface{}) (err error) {
+	if repository.Repo.Debug {
+		err = repository.Repo.DB.Debug().Model(&modelRole).Where("id = ?", modelRole.ID).Updates(data).Error
+	} else {
+		err = repository.Repo.DB.Model(&modelRole).Where("id = ?", modelRole.ID).Updates(data).Error
 	}
 
 	if err != nil {
-		return &models.Role{}, err
+		return err
 	}
 
-	return role, nil
+	if repository.Repo.Debug {
+		err = repository.Repo.DB.Debug().Where("id = ?", modelRole.ID).Take(&modelRole).Error
+	} else {
+		err = repository.Repo.DB.Where("id = ?", modelRole.ID).Take(&modelRole).Error
+	}
+
+	return err
 }
 
-func (repository *RoleRepository) Update(role *models.Role, data map[string]interface{}) (*models.Role, error) {
-	var err error
-
-	if repository.Debug {
-		err = repository.DB.Debug().Model(&role).Where("id = ?", role.ID).Updates(data).Error
-	} else {
-		err = repository.DB.Model(&role).Where("id = ?", role.ID).Updates(data).Error
-	}
-
-	if err != nil {
-		return role, err
-	}
-
-	if repository.Debug {
-		err = repository.DB.Debug().Where("id = ?", role.ID).Take(&role).Error
-	} else {
-		err = repository.DB.Where("id = ?", role.ID).Take(&role).Error
-	}
-
-	if err != nil {
-		return role, err
-	}
-
-	return role, nil
-}
-
-func (repository *RoleRepository) Delete(role *models.Role) (int64, error) {
+func (repository *RoleRepository) Delete(modelRole *models.Role) (int64, error) {
 	var db *gorm.DB
-	if repository.Debug {
-		db = repository.DB.Debug().Where("id = ?", role.ID).Delete(&models.Role{})
+
+	if repository.Repo.Debug {
+		db = repository.Repo.DB.Debug().Where("id = ?", modelRole.ID).Delete(&models.Role{})
 	} else {
-		db = repository.DB.Where("id = ?", role.ID).Delete(&models.Role{})
+		db = repository.Repo.DB.Where("id = ?", modelRole.ID).Delete(&models.Role{})
 	}
 
 	if db.Error != nil {
@@ -72,44 +60,36 @@ func (repository *RoleRepository) Delete(role *models.Role) (int64, error) {
 	return db.RowsAffected, nil
 }
 
-func (repository *RoleRepository) FindAll() (roles *[]models.Role, err error) {
-	if repository.Debug {
-		err = repository.DB.Debug().Find(&roles).Error
+func (repository *RoleRepository) FindAll() (modelsRole *[]models.Role, err error) {
+	if repository.Repo.Debug {
+		err = repository.Repo.DB.Debug().Find(&modelsRole).Error
 	} else {
-		err = repository.DB.Find(&roles).Error
+		err = repository.Repo.DB.Find(&modelsRole).Error
 	}
 
-	if err != nil {
-		return &[]models.Role{}, err
-	}
-	return roles, err
+	return modelsRole, err
 }
 
-func (repository *RoleRepository) FindOneByID(uid uint) (role *models.Role, err error) {
-	var db *gorm.DB
-
-	if repository.Debug {
-		db = repository.DB.Debug().First(&role, uid)
+func (repository *RoleRepository) FindOneByID(id uint) (modelRole *models.Role, err error) {
+	if repository.Repo.Debug {
+		err = repository.Repo.DB.Debug().First(&modelRole, id).Error
 	} else {
-		db = repository.DB.First(&role, uid)
+		err = repository.Repo.DB.First(&modelRole, id).Error
 	}
 
-	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
-		return role, fmt.Errorf("role `%d` doesn't managed to find: %s", uid, db.Error)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return modelRole, fmt.Errorf("unable to find role %d: %s", id, err)
 	}
 
-	return role, db.Error
+	return modelRole, err
 }
 
-func (repository *RoleRepository) FindOneByName(roleName string) (*models.Role, error) {
-	var db *gorm.DB
-	var role = &models.Role{}
-
-	if repository.Debug {
-		db = repository.DB.Debug().Where("name = ?", roleName).First(role)
+func (repository *RoleRepository) FindOneByName(roleName string) (modelRole *models.Role, err error) {
+	if repository.Repo.Debug {
+		err = repository.Repo.DB.Debug().Where("name = ?", roleName).First(&modelRole).Error
 	} else {
-		db = repository.DB.Where("name = ?", roleName).First(role)
+		err = repository.Repo.DB.Where("name = ?", roleName).First(&modelRole).Error
 	}
 
-	return role, db.Error
+	return modelRole, err
 }
