@@ -37,9 +37,10 @@ func main() {
 		}
 	}(dbConnection)
 
-	accountRepository := repositories.NewAccountRepository(db, true)
+	repository := repositories.NewRepository(db, true)
+	accountRepository := repositories.NewAccountRepository(repository)
 	accountService := services.NewAccountService(accountRepository)
-	roleRepository := repositories.NewRoleRepository(db, true)
+	roleRepository := repositories.NewRoleRepository(repository)
 	roleService := services.NewRoleService(roleRepository)
 
 	serveMux := http.NewServeMux()
