@@ -12,8 +12,8 @@ type RoleService struct {
 	repository *repositories.RoleRepository
 }
 
-func NewRoleService(r *repositories.RoleRepository) *RoleService {
-	return &RoleService{r}
+func NewRoleService(rr *repositories.RoleRepository) *RoleService {
+	return &RoleService{rr}
 }
 
 func (service *RoleService) Validate(role *models.Role) error {
@@ -30,40 +30,51 @@ func (service *RoleService) Validate(role *models.Role) error {
 	return nil
 }
 
-func (service *RoleService) Create(role *models.Role) (*models.Role, error) {
-	err := service.Validate(role)
+func (service *RoleService) Create(modelRole *models.Role) (*models.Role, error) {
+	err := service.Validate(modelRole)
 	if err != nil {
 		return &models.Role{}, err
 	}
 
-	return service.repository.Create(role)
+	err = service.repository.Create(modelRole)
+	if err != nil {
+		return &models.Role{}, err
+	}
+
+	return modelRole, nil
 }
 
-func (service *RoleService) Update(role *models.Role) (*models.Role, error) {
-	err := service.Validate(role)
+func (service *RoleService) Update(modelRole *models.Role) (*models.Role, error) {
+	err := service.Validate(modelRole)
 	if err != nil {
 		return &models.Role{}, err
 	}
 
 	data := map[string]interface{}{
-		"name":       role.Name,
+		"name":       modelRole.Name,
 		"updated_at": time.Now(),
 	}
 
-	return service.repository.Update(role, data)
-}
-
-func (service *RoleService) Delete(role *models.Role) (int64, error) {
-	return service.repository.Delete(role)
-}
-
-func (service *RoleService) FindOneByNameOrCreate(name string) (*models.Role, error) {
-	role, err := service.repository.FindOneByName(name)
+	err = service.repository.Update(modelRole, data)
 	if err != nil {
-		role, err = service.repository.Create(&models.Role{Name: name})
+		return &models.Role{}, err
 	}
 
-	return role, nil
+	return modelRole, nil
+}
+
+func (service *RoleService) Delete(modelRole *models.Role) (int64, error) {
+	return service.repository.Delete(modelRole)
+}
+
+func (service *RoleService) FindOneByNameOrCreate(roleName string) (*models.Role, error) {
+	modelRole, err := service.repository.FindOneByName(roleName)
+	if err != nil {
+		modelRole = &models.Role{Name: roleName}
+		err = service.repository.Create(modelRole)
+	}
+
+	return modelRole, nil
 }
 
 func (service *RoleService) GetRepository() *repositories.RoleRepository {
