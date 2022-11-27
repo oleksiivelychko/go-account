@@ -19,11 +19,13 @@ func NewAccountService(ar *repositories.AccountRepository) *AccountService {
 	return &AccountService{ar}
 }
 
-func (service *AccountService) VerifyPassword(model *models.Account, password string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(model.Password), []byte(password)); err != nil {
-		return err
-	}
-	return nil
+/*
+VerifyPassword
+modelAccount *models.Account contains hashed password
+password string - contains non-hashed password
+*/
+func (service *AccountService) VerifyPassword(modelAccount *models.Account, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(modelAccount.Password), []byte(password))
 }
 
 func (service *AccountService) Serialize(model *models.Account) *models.AccountSerialized {
@@ -66,45 +68,55 @@ func (service *AccountService) Validate(account *models.Account) error {
 	return nil
 }
 
-func (service *AccountService) Create(account *models.Account) (*models.Account, error) {
-	err := service.Validate(account)
+func (service *AccountService) Create(modelAccount *models.Account) (*models.Account, error) {
+	err := service.Validate(modelAccount)
 	if err != nil {
 		return &models.Account{}, err
 	}
 
-	return service.repository.Create(account)
+	err = service.repository.Create(modelAccount)
+	if err != nil {
+		return &models.Account{}, err
+	}
+
+	return modelAccount, nil
 }
 
-func (service *AccountService) Update(account *models.Account) (*models.Account, error) {
-	err := service.Validate(account)
+func (service *AccountService) Update(modelAccount *models.Account) (*models.Account, error) {
+	err := service.Validate(modelAccount)
 	if err != nil {
 		return &models.Account{}, err
 	}
 
 	data := map[string]interface{}{
-		"password":   account.Password,
-		"email":      account.Email,
+		"password":   modelAccount.Password,
+		"email":      modelAccount.Email,
 		"updated_at": time.Now(),
 	}
 
-	return service.repository.Update(account, data)
+	err = service.repository.Update(modelAccount, data)
+	if err != nil {
+		return &models.Account{}, err
+	}
+
+	return modelAccount, nil
 }
 
-func (service *AccountService) Delete(account *models.Account) (int64, error) {
-	return service.repository.Delete(account)
+func (service *AccountService) Delete(modelAccount *models.Account) (int64, error) {
+	return service.repository.Delete(modelAccount)
 }
 
 func (service *AccountService) Auth(email, password string) (accountSerialized *models.AccountSerialized, err error) {
-	account, err := service.repository.FindOneByEmail(email, true)
+	modelAccount, err := service.repository.FindOneByEmail(email, true)
 
 	if err == nil {
-		err = service.VerifyPassword(account, password)
+		err = service.VerifyPassword(modelAccount, password)
 		if err != nil {
 			return nil, fmt.Errorf("invalid password: %s", err)
 		}
 	}
 
-	return service.Serialize(account), err
+	return service.Serialize(modelAccount), err
 }
 
 func (service *AccountService) GetRepository() *repositories.AccountRepository {
