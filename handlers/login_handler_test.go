@@ -19,21 +19,20 @@ func TestLoginHandler(t *testing.T) {
 		t.Errorf("initialization test environment error: %s", err)
 	}
 
-	inputAccount := &models.Account{
-		Email:    "test@test.test",
-		Password: "secret",
-	}
-
-	accountRepository := repositories.NewAccountRepository(db, false)
+	repository := repositories.NewRepository(db, false)
+	accountRepository := repositories.NewAccountRepository(repository)
 	accountService := services.NewAccountService(accountRepository)
 
-	inputAccount, err = accountService.Create(&models.Account{
-		Email:    inputAccount.Email,
-		Password: inputAccount.Password,
+	inputAccount, err := accountService.Create(&models.Account{
+		Email:    "test@test.test",
+		Password: "secret",
 	})
 	if err != nil {
-		t.Fatalf("unable to create account: %s", err)
+		t.Fatalf("unable to create account model: %s", err)
 	}
+
+	// send non-hashed password
+	inputAccount.Password = "secret"
 
 	payload := new(bytes.Buffer)
 	_ = json.NewEncoder(payload).Encode(inputAccount)
@@ -54,25 +53,29 @@ func TestLoginHandler(t *testing.T) {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
 
-	loggedAccount := &models.AccountSerialized{}
-	err = json.Unmarshal(body, &loggedAccount)
+	accountSerialized := &models.AccountSerialized{}
+	err = json.Unmarshal(body, &accountSerialized)
 	if err != nil {
 		t.Fatalf("unable to unmarshal response body: %s", err.Error())
 	}
 
-	if loggedAccount.Email != inputAccount.Email {
+	if accountSerialized.ID != inputAccount.ID {
+		t.Fatalf("id mismatch")
+	}
+
+	if accountSerialized.Email != inputAccount.Email {
 		t.Fatalf("email mismatch")
 	}
 
-	if loggedAccount.AccessToken == "" {
+	if accountSerialized.AccessToken == "" {
 		t.Fatalf("got empty `access_token`")
 	}
 
-	if loggedAccount.RefreshToken == "" {
+	if accountSerialized.RefreshToken == "" {
 		t.Fatalf("got empty `refresh_token`")
 	}
 
-	if loggedAccount.ExpirationTime == "" {
+	if accountSerialized.ExpirationTime == "" {
 		t.Fatalf("got empty `expiration_time`")
 	}
 }

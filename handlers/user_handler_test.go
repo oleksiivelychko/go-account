@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -20,15 +21,20 @@ func TestUserHandler(t *testing.T) {
 		t.Errorf("initialization test environment error: %s", err)
 	}
 
-	accountRepository := repositories.NewAccountRepository(db, false)
-	createdAccount, _ := accountRepository.Create(&models.Account{
-		Email:    "test@test.test",
-		Password: "secret",
-	})
-
+	repository := repositories.NewRepository(db, false)
+	accountRepository := repositories.NewAccountRepository(repository)
 	accountService := services.NewAccountService(accountRepository)
 
-	accountSerialized, err := requests.AccessTokenRequest(&models.AccountSerialized{ID: createdAccount.ID})
+	inputAccount := &models.Account{
+		Email:    "test@test.test",
+		Password: "secret",
+	}
+	err = accountRepository.Create(inputAccount)
+	if err != nil {
+		t.Errorf("unable to create account model: %s", err)
+	}
+
+	accountSerialized, err := requests.AccessTokenRequest(&models.AccountSerialized{ID: inputAccount.ID})
 	if err != nil {
 		t.Fatalf("access token request error: %s", err)
 	}
@@ -55,18 +61,21 @@ func TestUserHandler(t *testing.T) {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
 
-	account := &models.Account{}
-	err = json.Unmarshal(body, &account)
+	modelAccount := &models.Account{}
+	err = json.Unmarshal(body, &modelAccount)
 	if err != nil {
 		t.Fatalf("unable to unmarshal response body: %s", err.Error())
 	}
 
-	if account.Email != account.Email {
+	if modelAccount.ID != inputAccount.ID {
+		t.Fatalf("id mismatch")
+	}
+
+	if modelAccount.Email != inputAccount.Email {
 		t.Fatalf("email mismatch")
 	}
 
-	verifiedPasswordErr := accountService.VerifyPassword(account, "secret")
-	if verifiedPasswordErr != nil {
-		t.Errorf("unable to verify password: %s", verifiedPasswordErr)
+	if reflect.TypeOf(modelAccount.CreatedAt).Name() != "DateTime" || reflect.TypeOf(modelAccount.UpdatedAt).Name() != "DateTime" {
+		t.Fatalf("DateTime type mismatch")
 	}
 }

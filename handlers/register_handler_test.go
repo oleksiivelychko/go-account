@@ -23,14 +23,16 @@ func TestRegisterHandler(t *testing.T) {
 		Email:    "test@test.test",
 		Password: "secret",
 	}
+
 	payload := new(bytes.Buffer)
 	_ = json.NewEncoder(payload).Encode(inputAccount)
 
 	request, _ := http.NewRequest("POST", "/api/account/register", payload)
 	response := httptest.NewRecorder()
 
-	accountRepository := repositories.NewAccountRepository(db, false)
-	roleRepository := repositories.NewRoleRepository(db, false)
+	repository := repositories.NewRepository(db, false)
+	accountRepository := repositories.NewAccountRepository(repository)
+	roleRepository := repositories.NewRoleRepository(repository)
 	accountService := services.NewAccountService(accountRepository)
 	roleService := services.NewRoleService(roleRepository)
 
@@ -47,17 +49,13 @@ func TestRegisterHandler(t *testing.T) {
 		t.Fatalf("unable to read response body: %s", err.Error())
 	}
 
-	newAccount := &models.Account{}
-	err = json.Unmarshal(body, &newAccount)
+	accountSerialized := &models.AccountSerialized{}
+	err = json.Unmarshal(body, &accountSerialized)
 	if err != nil {
 		t.Fatalf("unable to unmarshal response body: %s", err.Error())
 	}
 
-	if newAccount.Email != inputAccount.Email {
+	if accountSerialized.Email != inputAccount.Email {
 		t.Fatalf("email mismatch")
-	}
-
-	if accountService.VerifyPassword(inputAccount, inputAccount.Password) != nil {
-		t.Fatalf("password mismatch")
 	}
 }
