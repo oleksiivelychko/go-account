@@ -26,9 +26,11 @@ func (handler *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var inputAccount models.Account
+
 	err := json.NewDecoder(r.Body).Decode(&inputAccount)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 
