@@ -1,20 +1,12 @@
 package services
 
 import (
-	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
-	"github.com/oleksiivelychko/go-account/repositories"
 	"testing"
 )
 
 func TestCreateRole(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
-
-	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := NewRoleService(roleRepository)
+	_, roleService := InitTest()
 
 	createdRole, err := roleService.Create(&models.Role{Name: "guest"})
 
@@ -28,13 +20,7 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestUpdateRole(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
-
-	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := NewRoleService(roleRepository)
+	_, roleService := InitTest()
 
 	role, err := roleService.Create(&models.Role{Name: "guest"})
 	role.Name = "user"
@@ -50,18 +36,36 @@ func TestUpdateRole(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
-
-	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := NewRoleService(roleRepository)
+	_, roleService := InitTest()
 
 	role, err := roleService.Create(&models.Role{Name: "guest"})
 
-	rowsAffected, err := roleRepository.Delete(role)
+	rowsAffected, err := roleService.Delete(role)
 	if err != nil && rowsAffected == 0 {
 		t.Errorf("unable to delete role model: %s", err)
+	}
+}
+
+func TestFindAllRoles(t *testing.T) {
+	_, roleService := InitTest()
+
+	var roles []models.Role
+	role, _ := roleService.FindOneByNameOrCreate("user")
+	roles = append(roles, *role)
+
+	_, err := roleService.Create(&models.Role{Name: "guest"})
+	_, err = roleService.Create(&models.Role{Name: "user"})
+
+	modelsRole, err := roleService.GetRepository().FindAll()
+	if err != nil {
+		t.Errorf("unable to find all role models: %s", err)
+	}
+
+	if len(*modelsRole) != 2 {
+		t.Errorf("role models length mismatch: %d != 2", len(*modelsRole))
+	}
+
+	if cap(*modelsRole) != 20 {
+		t.Errorf("role models capacity mismatch: %d != 20", cap(*modelsRole))
 	}
 }
