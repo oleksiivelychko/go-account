@@ -1,22 +1,30 @@
 package services
 
 import (
+	"fmt"
 	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
+	"os"
 	"testing"
 )
 
-func TestCreateAccount(t *testing.T) {
+func InitTest() (accountService *AccountService, roleService *RoleService) {
 	db, err := initdb.TestPrepare()
 	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
+		fmt.Printf("initialization test environment error: %s", err)
+		os.Exit(0)
 	}
 
-	accountRepository := repositories.NewAccountRepository(db, false)
-	accountService := NewAccountService(accountRepository)
-	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := NewRoleService(roleRepository)
+	repository := repositories.NewRepository(db, false)
+	accountRepository := repositories.NewAccountRepository(repository)
+	roleRepository := repositories.NewRoleRepository(repository)
+
+	return NewAccountService(accountRepository), NewRoleService(roleRepository)
+}
+
+func TestCreateAccount(t *testing.T) {
+	accountService, roleService := InitTest()
 
 	var roles []models.Role
 	role, _ := roleService.FindOneByNameOrCreate("user")
@@ -51,13 +59,7 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
-
-	accountRepository := repositories.NewAccountRepository(db, false)
-	accountService := NewAccountService(accountRepository)
+	accountService, _ := InitTest()
 
 	model, err := accountService.Create(&models.Account{
 		Email:    "test@test.test",
@@ -87,15 +89,9 @@ func TestUpdateAccount(t *testing.T) {
 }
 
 func TestAddRolesToAccount(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
+	accountService, roleService := InitTest()
 
-	accountRepository := repositories.NewAccountRepository(db, false)
-	accountService := NewAccountService(accountRepository)
-
-	model, err := accountService.Create(&models.Account{
+	modelAccount, err := accountService.Create(&models.Account{
 		Email:    "test@test.test",
 		Password: "secret",
 	})
@@ -104,42 +100,33 @@ func TestAddRolesToAccount(t *testing.T) {
 		t.Errorf("unable to create account model: %s", err)
 	}
 
-	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := NewRoleService(roleRepository)
-
 	// assign roles to existing account
-	var roles []models.Role
+	var roles []*models.Role
 
-	roleManager, err := roleRepository.FindOneByName("manager")
+	roleManager, err := roleService.GetRepository().FindOneByName("manager")
 	if err != nil {
 		roleManager, err = roleService.Create(&models.Role{Name: "manager"})
 	}
-	roles = append(roles, *roleManager)
+	roles = append(roles, roleManager)
 
-	roleSupplier, err := roleRepository.FindOneByName("supplier")
+	roleSupplier, err := roleService.GetRepository().FindOneByName("supplier")
 	if err != nil {
 		roleSupplier, err = roleService.Create(&models.Role{Name: "supplier"})
 	}
-	roles = append(roles, *roleSupplier)
+	roles = append(roles, roleSupplier)
 
-	model, err = accountRepository.AddRoles(model, roles)
+	modelAccountWithRoles, err := accountService.GetRepository().AddRoles(modelAccount, roles)
 	if err != nil {
 		t.Errorf("unable to add roles to account model: %s", err)
 	}
 
-	if len(model.Roles) != 2 {
-		t.Errorf("account model roles count mismatch: %d != 2", len(model.Roles))
+	if len(modelAccountWithRoles.Roles) != 2 {
+		t.Errorf("account model roles count mismatch: %d != 2", len(modelAccountWithRoles.Roles))
 	}
 }
 
 func TestDeleteRolesToAccount(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
-
-	accountRepository := repositories.NewAccountRepository(db, false)
-	accountService := NewAccountService(accountRepository)
+	accountService, roleService := InitTest()
 
 	model, err := accountService.Create(&models.Account{
 		Email:    "test@test.test",
@@ -149,9 +136,6 @@ func TestDeleteRolesToAccount(t *testing.T) {
 	if err != nil {
 		t.Errorf("unable to create account model: %s", err)
 	}
-
-	roleRepository := repositories.NewRoleRepository(db, false)
-	roleService := NewRoleService(roleRepository)
 
 	// assign roles to existing account
 	var roles []models.Role
@@ -162,7 +146,7 @@ func TestDeleteRolesToAccount(t *testing.T) {
 	roleSupplier, err := roleService.Create(&models.Role{Name: "supplier"})
 	roles = append(roles, *roleSupplier)
 
-	model, err = accountRepository.DeleteRoles(model, roles)
+	model, err = accountService.GetRepository().DeleteRoles(model, roles)
 	if err != nil {
 		t.Errorf("unable to delete roles from account model: %s", err)
 	}
@@ -173,13 +157,7 @@ func TestDeleteRolesToAccount(t *testing.T) {
 }
 
 func TestDeleteAccount(t *testing.T) {
-	db, err := initdb.TestPrepare()
-	if err != nil {
-		t.Errorf("initialization test environment error: %s", err)
-	}
-
-	accountRepository := repositories.NewAccountRepository(db, false)
-	accountService := NewAccountService(accountRepository)
+	accountService, _ := InitTest()
 
 	model, err := accountService.Create(&models.Account{
 		Email:    "test@test.test",
@@ -193,5 +171,46 @@ func TestDeleteAccount(t *testing.T) {
 	rowsAffected, err := accountService.Delete(model)
 	if rowsAffected == 0 && err != nil {
 		t.Errorf("unable to delete account model: %s", err)
+	}
+}
+
+func TestFindAllAccountsWithRoles(t *testing.T) {
+	accountService, roleService := InitTest()
+
+	var roles []models.Role
+	role, _ := roleService.FindOneByNameOrCreate("user")
+	roles = append(roles, *role)
+
+	_, err := accountService.Create(&models.Account{
+		Email:    "test1@test.test",
+		Password: "secret",
+		Roles:    roles,
+	})
+
+	_, err = accountService.Create(&models.Account{
+		Email:    "test2@test.test",
+		Password: "secret",
+		Roles:    roles,
+	})
+
+	modelsAccount, err := accountService.GetRepository().FindAll()
+	if err != nil {
+		t.Errorf("unable to find all account models: %s", err)
+	}
+
+	if len(*modelsAccount) != 2 {
+		t.Errorf("account models length mismatch: %d != 2", len(*modelsAccount))
+	}
+
+	if cap(*modelsAccount) != 20 {
+		t.Errorf("account models capacity mismatch: %d != 20", cap(*modelsAccount))
+	}
+
+	if len((*modelsAccount)[0].Roles) != 1 {
+		t.Errorf("account model roles length mismatch: %d != 1", len((*modelsAccount)[0].Roles))
+	}
+
+	if cap((*modelsAccount)[0].Roles) != 10 {
+		t.Errorf("account model roles capacity mismatch: %d != 10", cap((*modelsAccount)[0].Roles))
 	}
 }
