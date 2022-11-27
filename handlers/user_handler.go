@@ -39,7 +39,7 @@ func (handler *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := handler.accountService.GetRepository().FindOneByID(uint(userID))
+	modelAccount, err := handler.accountService.GetRepository().FindOneByID(uint(userID))
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))
@@ -47,5 +47,5 @@ func (handler *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(account)
+	_ = json.NewEncoder(w).Encode(modelAccount)
 }
