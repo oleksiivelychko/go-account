@@ -7,7 +7,6 @@ docker-build:
 	docker build --tag local/goaccount .
 
 docker-push: docker-build
-	$(warning instead of `local` prefix use dockerhub account name and change/remove `imagePullPolicy`.)
-	docker buildx build --platform linux/amd64 --tag local/gojwtissuer .
-	docker push local/gojwtissuer
-
+	$(warning instead of `local` prefix use dockerhub account name and change/remove `imagePullPolicy`)
+	docker buildx build --platform linux/amd64 --tag local/goaccount .
+	docker push local/goaccount
