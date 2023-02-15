@@ -4,9 +4,12 @@ go-test:
 
 docker-build:
 	[[ -z "$(docker images -q local/goaccount)" ]] || docker image rm local/goaccount
-	docker build --tag local/goaccount .
+	docker build --no-cache --tag local/goaccount .
 
 docker-push: docker-build
 	$(warning instead of `local` prefix use dockerhub account name and change/remove `imagePullPolicy`)
 	docker buildx build --platform linux/amd64 --tag local/goaccount .
 	docker push local/goaccount
+
+docker-network:
+	docker network inspect go-network >/dev/null 2>&1 || docker network create --driver bridge go-network

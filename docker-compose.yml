@@ -15,7 +15,7 @@ services:
     ports:
       - ${DB_PORT:-5432}:5432
     networks:
-      - go-network
+      - go-network-external
 
   postgres-test:
     container_name: postgres_test
@@ -30,8 +30,9 @@ services:
     ports:
       - ${TEST_DB_PORT:-5433}:5432
     networks:
-      - go-network
+      - go-network-external
 
 networks:
-  go-network:
-    driver: bridge
+  go-network-external:
+    external: true
+    name: go-network
