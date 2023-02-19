@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/badoux/checkmail v1.2.1
 	github.com/jinzhu/gorm v1.9.16
-	github.com/oleksiivelychko/go-jwt-issuer v1.0.2
+	github.com/oleksiivelychko/go-jwt-issuer v1.0.3
 	golang.org/x/crypto v0.6.0
 	gorm.io/driver/postgres v1.4.8
 	gorm.io/gorm v1.24.5
