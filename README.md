@@ -1,6 +1,6 @@
 # go-account
 
-### Microservice provides API to manage users accounts including ACL, enhanced by third-party JWT microservice.
+### Microservice provides API to manage users accounts including ACL. Enhanced by third-party JWT microservice.
 
 📌 There are available environment variables with default values:
 ```
