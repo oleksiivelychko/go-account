@@ -75,7 +75,7 @@ func TestUserHandler(t *testing.T) {
 		t.Fatalf("email mismatch")
 	}
 
-	if reflect.TypeOf(modelAccount.CreatedAt).Name() != "DateTime" || reflect.TypeOf(modelAccount.UpdatedAt).Name() != "DateTime" {
+	if reflect.TypeOf(modelAccount.CreatedAt).Name() != "GormDateTime" || reflect.TypeOf(modelAccount.UpdatedAt).Name() != "GormDateTime" {
 		t.Fatalf("DateTime type mismatch")
 	}
 }
