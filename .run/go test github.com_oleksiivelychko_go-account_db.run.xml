@@ -1,0 +1,27 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go test github.com/oleksiivelychko/go-account/db" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+    <module name="go-account" />
+    <working_directory value="$PROJECT_DIR$/db" />
+    <envs>
+      <env name="DB_SSL_MODE" value="disable" />
+      <env name="DB_TIMEZONE" value="UTC" />
+      <env name="TEST_DB_HOST" value="localhost" />
+      <env name="TEST_DB_NAME" value="account-test" />
+      <env name="TEST_DB_PASSWORD" value="test" />
+      <env name="TEST_DB_PORT" value="5433" />
+      <env name="TEST_DB_USERNAME" value="test" />
+    </envs>
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.GoAwsConnectionRunConfigurationExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
+    <root_directory value="$PROJECT_DIR$" />
+    <kind value="PACKAGE" />
+    <package value="github.com/oleksiivelychko/go-account/db" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <method v="2" />
+  </configuration>
+</component>
