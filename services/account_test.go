@@ -82,7 +82,7 @@ func TestServices_UpdateAccount(t *testing.T) {
 
 	verifiedPasswordErr := accountService.VerifyPassword(accountUpdated, "secret1")
 	if verifiedPasswordErr != nil {
-		t.Error(verifiedPasswordErr)
+		t.Fatal(verifiedPasswordErr)
 	}
 }
 
@@ -123,7 +123,7 @@ func TestServices_AddRolesToAccount(t *testing.T) {
 	}
 
 	if len(accountWithRoles.Roles) != 2 {
-		t.Errorf("account roles count mismatch: %d != 2", len(accountWithRoles.Roles))
+		t.Fatalf("account roles count mismatch: %d != 2", len(accountWithRoles.Roles))
 	}
 }
 
@@ -162,7 +162,7 @@ func TestServices_DeleteRolesFromAccount(t *testing.T) {
 	}
 
 	if len(account.Roles) != 0 {
-		t.Errorf("account roles count mismatch: %d != 0", len(account.Roles))
+		t.Fatalf("account roles count mismatch: %d != 0", len(account.Roles))
 	}
 }
 
@@ -180,7 +180,7 @@ func TestServices_DeleteAccount(t *testing.T) {
 
 	rowsAffected, err := accountService.Delete(account)
 	if rowsAffected == 0 && err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 
