@@ -7,40 +7,42 @@ import (
 	"time"
 )
 
-type GormDateTime time.Time
+type DateTime time.Time
 
 //goland:noinspection GoMixedReceiverTypes
-func (dt *GormDateTime) MarshalJSON() ([]byte, error) {
-	timestamp := time.Time(*dt)
-	return []byte(fmt.Sprintf("\"%v\"", timestamp.Format(time.DateTime))), nil
+func (datetime *DateTime) MarshalJSON() ([]byte, error) {
+	instantDatetime := time.Time(*datetime)
+	return []byte(fmt.Sprintf("\"%v\"", instantDatetime.Format(time.DateTime))), nil
 }
 
 //goland:noinspection GoMixedReceiverTypes
-func (dt *GormDateTime) UnmarshalJSON(b []byte) (err error) {
-	s := strings.Trim(string(b), "\"")
-	date, err := time.Parse(time.DateTime, s)
+func (datetime *DateTime) UnmarshalJSON(b []byte) (err error) {
+	parsedTime, err := time.Parse(time.DateTime, strings.Trim(string(b), "\""))
 	if err != nil {
 		return err
 	}
-	*dt = GormDateTime(date)
+
+	*datetime = DateTime(parsedTime)
 	return
 }
 
 //goland:noinspection GoMixedReceiverTypes
-func (dt GormDateTime) Value() (driver.Value, error) {
-	var zeroTimestamp time.Time
-	timestamp := time.Time(dt)
-	if timestamp.UnixNano() == zeroTimestamp.UnixNano() {
+func (datetime DateTime) Value() (driver.Value, error) {
+	var instantTime time.Time
+	instantDatetime := time.Time(datetime)
+	if instantDatetime.UnixNano() == instantTime.UnixNano() {
 		return nil, nil
 	}
-	return timestamp, nil
+
+	return instantDatetime, nil
 }
 
 //goland:noinspection GoMixedReceiverTypes
-func (dt *GormDateTime) Scan(v interface{}) error {
+func (datetime *DateTime) Scan(v interface{}) error {
 	if value, ok := v.(time.Time); ok {
-		*dt = GormDateTime(value)
+		*datetime = DateTime(value)
 		return nil
 	}
-	return fmt.Errorf("unable to convert %v to timestamp", v)
+
+	return fmt.Errorf("unable to assign '%v' from DB to time.Time", v)
 }
