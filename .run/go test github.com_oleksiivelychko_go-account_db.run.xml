@@ -10,6 +10,7 @@
       <env name="TEST_DB_PASSWORD" value="test" />
       <env name="TEST_DB_PORT" value="5433" />
       <env name="TEST_DB_USERNAME" value="test" />
+      <env name="APP_JWT_URL" value="http://localhost:8080" />
     </envs>
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.GoAwsConnectionRunConfigurationExtension">
       <option name="credential" />
