@@ -14,21 +14,21 @@ func NewAccount(repo *Repository) *Account {
 	return &Account{Repo: repo}
 }
 
-func (repo *Account) Create(modelAccount *models.Account) (err error) {
+func (repo *Account) Create(account *models.Account) (err error) {
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Create(&modelAccount).Error
+		err = repo.Repo.DB.Debug().Create(&account).Error
 	} else {
-		err = repo.Repo.DB.Create(&modelAccount).Error
+		err = repo.Repo.DB.Create(&account).Error
 	}
 
 	return err
 }
 
-func (repo *Account) Update(modelAccount *models.Account, data map[string]interface{}) (err error) {
+func (repo *Account) Update(account *models.Account, data map[string]interface{}) (err error) {
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Model(&modelAccount).Where("id = ?", modelAccount.ID).Updates(data).Error
+		err = repo.Repo.DB.Debug().Model(&account).Where("id = ?", account.ID).Updates(data).Error
 	} else {
-		err = repo.Repo.DB.Model(&modelAccount).Where("id = ?", modelAccount.ID).Updates(data).Error
+		err = repo.Repo.DB.Model(&account).Where("id = ?", account.ID).Updates(data).Error
 	}
 
 	if err != nil {
@@ -36,22 +36,22 @@ func (repo *Account) Update(modelAccount *models.Account, data map[string]interf
 	}
 
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Where("id = ?", modelAccount.ID).Take(&modelAccount).Error
+		err = repo.Repo.DB.Debug().Where("id = ?", account.ID).Take(&account).Error
 	} else {
-		err = repo.Repo.DB.Where("id = ?", modelAccount.ID).Take(&modelAccount).Error
+		err = repo.Repo.DB.Where("id = ?", account.ID).Take(&account).Error
 	}
 
 	return err
 }
 
-func (repo *Account) Delete(modelAccount *models.Account) (int64, error) {
+func (repo *Account) Delete(account *models.Account) (int64, error) {
 	var err error = nil
 	var db *gorm.DB
 
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Model(&modelAccount).Association("Roles").Clear()
+		err = repo.Repo.DB.Debug().Model(&account).Association("Roles").Clear()
 	} else {
-		err = repo.Repo.DB.Model(&modelAccount).Association("Roles").Clear()
+		err = repo.Repo.DB.Model(&account).Association("Roles").Clear()
 	}
 
 	if err != nil {
@@ -59,9 +59,9 @@ func (repo *Account) Delete(modelAccount *models.Account) (int64, error) {
 	}
 
 	if repo.Repo.Debug {
-		db = repo.Repo.DB.Debug().Where("id = ?", modelAccount.ID).Delete(&models.Account{})
+		db = repo.Repo.DB.Debug().Where("id = ?", account.ID).Delete(&models.Account{})
 	} else {
-		db = repo.Repo.DB.Where("id = ?", modelAccount.ID).Delete(&models.Account{})
+		db = repo.Repo.DB.Where("id = ?", account.ID).Delete(&models.Account{})
 	}
 
 	if db.Error != nil {
@@ -71,28 +71,28 @@ func (repo *Account) Delete(modelAccount *models.Account) (int64, error) {
 	return db.RowsAffected, nil
 }
 
-func (repo *Account) FindAll() (modelsAccount *[]models.Account, err error) {
+func (repo *Account) FindAll() (account *[]models.Account, err error) {
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Preload("Roles").Find(&modelsAccount).Error
+		err = repo.Repo.DB.Debug().Preload("Roles").Find(&account).Error
 	} else {
-		err = repo.Repo.DB.Preload("Roles").Find(&modelsAccount).Preload("Roles").Error
+		err = repo.Repo.DB.Preload("Roles").Find(&account).Preload("Roles").Error
 	}
 
-	return modelsAccount, err
+	return account, err
 }
 
-func (repo *Account) FindOneByID(id uint) (modelAccount *models.Account, err error) {
+func (repo *Account) FindOneByID(id uint) (account *models.Account, err error) {
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Preload("Roles").First(&modelAccount, id).Error
+		err = repo.Repo.DB.Debug().Preload("Roles").First(&account, id).Error
 	} else {
-		err = repo.Repo.DB.Preload("Roles").First(&modelAccount, id).Error
+		err = repo.Repo.DB.Preload("Roles").First(&account, id).Error
 	}
 
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("unable to find account by ID %d: %s", id, err)
 	}
 
-	return modelAccount, err
+	return account, err
 }
 
 func (repo *Account) FindOneByEmail(email string, withRoles bool) (*models.Account, error) {
@@ -118,34 +118,34 @@ func (repo *Account) FindOneByEmail(email string, withRoles bool) (*models.Accou
 	return modelAccount, db.Error
 }
 
-func (repo *Account) AddRoles(modelAccount *models.Account, roles []*models.Role) (*models.Account, error) {
+func (repo *Account) AddRoles(account *models.Account, roles []*models.Role) (*models.Account, error) {
 	var err error
 
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Model(&modelAccount).Association("Roles").Append(&roles)
+		err = repo.Repo.DB.Debug().Model(&account).Association("Roles").Append(&roles)
 	} else {
-		err = repo.Repo.DB.Model(&modelAccount).Association("Roles").Append(&roles)
+		err = repo.Repo.DB.Model(&account).Association("Roles").Append(&roles)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return repo.FindOneByID(modelAccount.ID)
+	return repo.FindOneByID(account.ID)
 }
 
-func (repo *Account) DeleteRoles(modelAccount *models.Account, roles []models.Role) (*models.Account, error) {
+func (repo *Account) DeleteRoles(account *models.Account, roles []models.Role) (*models.Account, error) {
 	var err error
 
 	if repo.Repo.Debug {
-		err = repo.Repo.DB.Debug().Model(&modelAccount).Association("Roles").Delete(&roles)
+		err = repo.Repo.DB.Debug().Model(&account).Association("Roles").Delete(&roles)
 	} else {
-		err = repo.Repo.DB.Model(&modelAccount).Association("Roles").Delete(&roles)
+		err = repo.Repo.DB.Model(&account).Association("Roles").Delete(&roles)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return repo.FindOneByID(modelAccount.ID)
+	return repo.FindOneByID(account.ID)
 }
