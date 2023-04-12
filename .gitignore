@@ -1,3 +1,5 @@
 .idea
-.docker_postgres/data*
-logs
+.data/log/*
+!.data/log/.gitkeep
+.data/postgres/*
+!.data/postgres/.gitkeep
