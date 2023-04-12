@@ -71,25 +71,25 @@ func AutoMigrate(db *gorm.DB) error {
 }
 
 func makeDSN(isTest bool) string {
-	dsn := "host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s"
+	dsn := "host=%s port=%s dbname=%s user=%s password=%s sslmode=%s TimeZone=%s"
 
 	if isTest {
-		return fmt.Sprintf(dsn,
-			os.Getenv("DB_HOST"),
-			os.Getenv("DB_USERNAME"),
-			os.Getenv("DB_PASSWORD"),
-			os.Getenv("DB_NAME"),
-			os.Getenv("DB_PORT"),
-			os.Getenv("DB_SSL_MODE"),
-			os.Getenv("DB_TIMEZONE"),
-		)
-	} else {
 		return fmt.Sprintf(dsn,
 			os.Getenv("TEST_DB_HOST"),
 			os.Getenv("TEST_DB_PORT"),
 			os.Getenv("TEST_DB_NAME"),
 			os.Getenv("TEST_DB_USERNAME"),
 			os.Getenv("TEST_DB_PASSWORD"),
+			os.Getenv("DB_SSL_MODE"),
+			os.Getenv("DB_TIMEZONE"),
+		)
+	} else {
+		return fmt.Sprintf(dsn,
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"),
+			os.Getenv("DB_USERNAME"),
+			os.Getenv("DB_PASSWORD"),
 			os.Getenv("DB_SSL_MODE"),
 			os.Getenv("DB_TIMEZONE"),
 		)
