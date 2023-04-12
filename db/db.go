@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/oleksiivelychko/go-account/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -49,16 +50,7 @@ Connection DATABASE_URL=postgres://admin:secret@localhost:5432/account
 func Connection() (*gorm.DB, error) {
 	var dsn = os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		dsn = fmt.Sprintf(
-			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-			os.Getenv("DB_HOST"),
-			os.Getenv("DB_USERNAME"),
-			os.Getenv("DB_PASSWORD"),
-			os.Getenv("DB_NAME"),
-			os.Getenv("DB_PORT"),
-			os.Getenv("DB_SSL_MODE"),
-			os.Getenv("DB_TIMEZONE"),
-		)
+		dsn = makeDSN(false)
 	}
 
 	return Session(dsn, os.Getenv("DB_LOG_PATH"))
@@ -78,38 +70,58 @@ func AutoMigrate(db *gorm.DB) error {
 	}
 }
 
-func makeTestDB(dbLogPath string) (*gorm.DB, error) {
-	var dsn = fmt.Sprintf(
-		"host=%s port=%s dbname=%s user=%s password=%s sslmode=%s TimeZone=%s",
-		os.Getenv("TEST_DB_HOST"),
-		os.Getenv("TEST_DB_PORT"),
-		os.Getenv("TEST_DB_NAME"),
-		os.Getenv("TEST_DB_USERNAME"),
-		os.Getenv("TEST_DB_PASSWORD"),
-		os.Getenv("DB_SSL_MODE"),
-		os.Getenv("DB_TIMEZONE"),
-	)
+func makeDSN(isTest bool) string {
+	dsn := "host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s"
 
-	return Session(dsn, dbLogPath)
+	if isTest {
+		return fmt.Sprintf(dsn,
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_USERNAME"),
+			os.Getenv("DB_PASSWORD"),
+			os.Getenv("DB_NAME"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_SSL_MODE"),
+			os.Getenv("DB_TIMEZONE"),
+		)
+	} else {
+		return fmt.Sprintf(dsn,
+			os.Getenv("TEST_DB_HOST"),
+			os.Getenv("TEST_DB_PORT"),
+			os.Getenv("TEST_DB_NAME"),
+			os.Getenv("TEST_DB_USERNAME"),
+			os.Getenv("TEST_DB_PASSWORD"),
+			os.Getenv("DB_SSL_MODE"),
+			os.Getenv("DB_TIMEZONE"),
+		)
+	}
+}
+
+func testConnection(dbLogPath string) (*gorm.DB, error) {
+	err := godotenv.Load("./../.env.test")
+	if err != nil {
+		log.Fatal("error loading .env.test file")
+	}
+
+	return Session(makeDSN(true), dbLogPath)
 }
 
 func PrepareTestDB() (*gorm.DB, error) {
-	db, err := makeTestDB("")
-	err = AutoMigrate(db)
+	sessionDB, err := testConnection("")
+	err = AutoMigrate(sessionDB)
 
 	statement := "TRUNCATE accounts RESTART IDENTITY CASCADE"
-	execSQL := db.Exec(statement)
+	execSQL := sessionDB.Exec(statement)
 	if execSQL.Error != nil {
 		return nil, execSQL.Error
 	}
 
 	statement = "TRUNCATE roles RESTART IDENTITY CASCADE"
-	execSQL = db.Exec(statement)
+	execSQL = sessionDB.Exec(statement)
 	if execSQL.Error != nil {
 		return nil, execSQL.Error
 	}
 
-	return db, err
+	return sessionDB, err
 }
 
 func GetLogPath(basePath string) string {
