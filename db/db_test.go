@@ -19,7 +19,7 @@ func TestDB_Session(t *testing.T) {
 }
 
 func TestDB_SessionLog(t *testing.T) {
-	dbLogPath := "./../.data/log"
+	dbLogPath := "./../.log"
 
 	_, err := makeTestDB(dbLogPath)
 	if err != nil {
