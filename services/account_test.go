@@ -48,11 +48,11 @@ func TestServices_CreateAccount(t *testing.T) {
 	}
 
 	if len(accountCreated.Roles) == 0 {
-		t.Error("account does not have any role")
+		t.Error("roles are missing")
 	}
 
 	if accountCreated.Roles[0].Name != "user" {
-		t.Errorf("account role mismatch: %s != user", accountCreated.Roles[0].Name)
+		t.Errorf("role name mismatch: %s != user", accountCreated.Roles[0].Name)
 	}
 }
 
@@ -77,12 +77,12 @@ func TestServices_UpdateAccount(t *testing.T) {
 	}
 
 	if accountUpdated.Email != "test1@test1.test1" {
-		t.Errorf("account email mismatch: %s != test1@test1.test1", accountUpdated.Email)
+		t.Errorf("email mismatch: %s != test1@test1.test1", accountUpdated.Email)
 	}
 
 	verifiedPasswordErr := accountService.VerifyPassword(accountUpdated, "secret1")
 	if verifiedPasswordErr != nil {
-		t.Fatal(verifiedPasswordErr)
+		t.Error(verifiedPasswordErr)
 	}
 }
 
@@ -115,7 +115,7 @@ func TestServices_AddRolesToAccount(t *testing.T) {
 	}
 
 	if len(accountWithRoles.Roles) != 2 {
-		t.Fatalf("account roles count mismatch: %d != 2", len(accountWithRoles.Roles))
+		t.Errorf("roles count mismatch: %d != 2", len(accountWithRoles.Roles))
 	}
 }
 
@@ -154,7 +154,7 @@ func TestServices_DeleteRolesFromAccount(t *testing.T) {
 	}
 
 	if len(account.Roles) != 0 {
-		t.Fatalf("account roles count mismatch: %d != 0", len(account.Roles))
+		t.Errorf("roles count mismatch: %d != 0", len(account.Roles))
 	}
 }
 
@@ -172,7 +172,7 @@ func TestServices_DeleteAccount(t *testing.T) {
 
 	rowsAffected, err := accountService.Delete(account)
 	if rowsAffected == 0 && err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }
 
@@ -213,18 +213,18 @@ func TestServices_FindAllAccountsWithRoles(t *testing.T) {
 	}
 
 	if len(*accounts) != 2 {
-		t.Errorf("accounts length mismatch: %d != 2", len(*accounts))
+		t.Errorf("length mismatch: %d != 2", len(*accounts))
 	}
 
 	if cap(*accounts) != 20 {
-		t.Errorf("accounts capacity mismatch: %d != 20", cap(*accounts))
+		t.Errorf("capacity mismatch: %d != 20", cap(*accounts))
 	}
 
 	if len((*accounts)[0].Roles) != 1 {
-		t.Errorf("accounts roles length mismatch: %d != 1", len((*accounts)[0].Roles))
+		t.Errorf("roles length mismatch: %d != 1", len((*accounts)[0].Roles))
 	}
 
 	if cap((*accounts)[0].Roles) != 10 {
-		t.Errorf("accounts roles capacity mismatch: %d != 10", cap((*accounts)[0].Roles))
+		t.Errorf("roles capacity mismatch: %d != 10", cap((*accounts)[0].Roles))
 	}
 }

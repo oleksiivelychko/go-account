@@ -29,7 +29,7 @@ func TestServices_CreateRole(t *testing.T) {
 	}
 
 	if role.Name != "guest" {
-		t.Fatalf("role name mismatch: %s != guest", role.Name)
+		t.Errorf("name mismatch: %s != guest", role.Name)
 	}
 }
 
@@ -44,7 +44,7 @@ func TestServices_UpdateRole(t *testing.T) {
 	}
 
 	if roleUpdated.Name != "user" {
-		t.Fatalf("role name mismatch: %s != user", roleUpdated.Name)
+		t.Errorf("name mismatch: %s != user", roleUpdated.Name)
 	}
 }
 
@@ -54,7 +54,7 @@ func TestServices_DeleteRole(t *testing.T) {
 
 	rowsAffected, err := service.Delete(role)
 	if err != nil && rowsAffected == 0 {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }
 
@@ -63,7 +63,7 @@ func TestServices_FindOrCreateRole(t *testing.T) {
 
 	_, err := service.FindOneByNameOrCreate("user")
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }
 
@@ -86,10 +86,10 @@ func TestServices_FindAllRoles(t *testing.T) {
 	}
 
 	if len(*roles) != 2 {
-		t.Errorf("role length mismatch: %d != 2", len(*roles))
+		t.Errorf("length mismatch: %d != 2", len(*roles))
 	}
 
 	if cap(*roles) != 20 {
-		t.Errorf("role capacity mismatch: %d != 20", cap(*roles))
+		t.Errorf("capacity mismatch: %d != 20", cap(*roles))
 	}
 }
