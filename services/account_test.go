@@ -101,19 +101,11 @@ func TestServices_AddRolesToAccount(t *testing.T) {
 	// assign roles to existing account
 	var roles []*models.Role
 
-	roleManager, err := roleService.GetRepository().FindOneByName("manager")
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	roleManager, _ := roleService.GetRepository().FindOneByName("manager")
 	roleManager, err = roleService.Create(&models.Role{Name: "manager"})
 	roles = append(roles, roleManager)
 
-	roleSupplier, err := roleService.GetRepository().FindOneByName("supplier")
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	roleSupplier, _ := roleService.GetRepository().FindOneByName("supplier")
 	roleSupplier, err = roleService.Create(&models.Role{Name: "supplier"})
 	roles = append(roles, roleSupplier)
 
