@@ -89,9 +89,9 @@ func (service *Account) Update(account *models.Account) (*models.Account, error)
 	}
 
 	err = service.repo.Update(account, map[string]interface{}{
-		"password":  account.Password,
-		"email":     account.Email,
-		"updatedAt": time.Now(),
+		"password":   account.Password,
+		"email":      account.Email,
+		"updated_at": time.Now(),
 	})
 
 	if err != nil {
