@@ -7,7 +7,7 @@ import (
 )
 
 func TestDB_Session(t *testing.T) {
-	session, err := makeTestDB("")
+	session, err := testConnection("")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -21,7 +21,7 @@ func TestDB_Session(t *testing.T) {
 func TestDB_SessionLog(t *testing.T) {
 	dbLogPath := "./../.log"
 
-	_, err := makeTestDB(dbLogPath)
+	_, err := testConnection(dbLogPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestDB_SessionLog(t *testing.T) {
 }
 
 func TestDB_AutoMigrate(t *testing.T) {
-	session, err := makeTestDB("")
+	session, err := testConnection("")
 	if err != nil {
 		t.Fatal(err)
 	}
