@@ -15,7 +15,7 @@ import (
 	"testing"
 )
 
-func TestUserHandler(t *testing.T) {
+func TestHandler_User(t *testing.T) {
 	sessionDB, err := db.PrepareTestDB()
 	if err != nil {
 		t.Fatal(err)

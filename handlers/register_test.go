@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestRegisterHandler(t *testing.T) {
+func TestHandlers_Register(t *testing.T) {
 	sessionDB, err := db.PrepareTestDB()
 	if err != nil {
 		t.Fatal(err)
