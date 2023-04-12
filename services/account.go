@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	"errors"
 	"github.com/badoux/checkmail"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/repositories"
@@ -61,7 +61,7 @@ func (service *Account) Validate(account *models.Account) error {
 		}
 
 		if accountFound.Email != "" {
-			return fmt.Errorf("email %s already exists", accountFound.Email)
+			return errors.New("account already exists")
 		}
 	}
 
