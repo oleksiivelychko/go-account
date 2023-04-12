@@ -1,7 +1,6 @@
 .idea
 .postgres
 .kube
-.run
 .log
 .gitignore
 LICENSE
