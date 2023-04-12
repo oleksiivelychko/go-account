@@ -1,10 +1,11 @@
 .idea
-.docker_postgres
+.data
 .kube
-logs
+.run
 .gitignore
 LICENSE
 docker-compose.yml
+Dockerfile
 Makefile
 README.md
 requests.http
