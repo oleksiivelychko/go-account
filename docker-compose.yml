@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-admin}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
-      - ./.data/postgres/db:/var/lib/postgresql
+      - ./.postgres/db:/var/lib/postgresql
     ports:
       - ${DB_PORT:-5432}:5432
     networks:
@@ -26,7 +26,7 @@ services:
       POSTGRES_USER: ${TEST_DB_USERNAME:-test}
       POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:-test}
     volumes:
-      - ./.data/postgres/dbtest:/var/lib/postgresql
+      - ./.postgres/dbtest:/var/lib/postgresql
     ports:
       - ${TEST_DB_PORT:-5433}:5432
     networks:

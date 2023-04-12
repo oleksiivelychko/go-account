@@ -1,5 +1,3 @@
 .idea
-.data/log/*
-!.data/log/.gitkeep
-.data/postgres/*
-!.data/postgres/.gitkeep
+.postgres
+.log
