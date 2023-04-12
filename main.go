@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/oleksiivelychko/go-account/db"
 	"github.com/oleksiivelychko/go-account/handlers"
-	"github.com/oleksiivelychko/go-account/initdb"
 	"github.com/oleksiivelychko/go-account/repositories"
 	"github.com/oleksiivelychko/go-account/services"
 	"log"
@@ -16,38 +17,36 @@ import (
 )
 
 func main() {
-	initdb.LoadEnv()
-	addr := os.Getenv("HOST") + ":" + os.Getenv("PORT")
-
-	db, err := initdb.DB()
+	session, err := db.Connection()
 	if err != nil {
-		log.Fatalf("failed database connection: %s", err)
+		log.Fatal(err)
 	}
 
-	err = initdb.AutoMigrate(db)
+	err = db.AutoMigrate(session)
 	if err != nil {
-		log.Fatalf("failed to run migrations: %s", err)
+		log.Fatal(err)
 	}
 
-	dbConnection, err := db.DB()
-	defer func(sqlDB *sql.DB) {
-		err = sqlDB.Close()
+	conn, err := session.DB()
+	defer func(conn *sql.DB) {
+		err = conn.Close()
 		if err != nil {
-			log.Fatalf("unable to close database connection: %s", err)
+			log.Fatal(err)
 		}
-	}(dbConnection)
+	}(conn)
 
-	repository := repositories.NewRepository(db, true)
-	accountRepository := repositories.NewAccountRepository(repository)
-	accountService := services.NewAccountService(accountRepository)
-	roleRepository := repositories.NewRoleRepository(repository)
-	roleService := services.NewRoleService(roleRepository)
+	repo := repositories.NewRepository(session, true)
+	accountRepo := repositories.NewAccount(repo)
+	accountService := services.NewAccount(accountRepo)
+	roleRepo := repositories.NewRole(repo)
+	roleService := services.NewRole(roleRepo)
 
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/api/account/register/", handlers.NewRegisterHandler(accountService, roleService))
-	serveMux.Handle("/api/account/login/", handlers.NewLoginHandler(accountService))
-	serveMux.Handle("/api/account/user/", handlers.NewUserHandler(accountService))
+	serveMux.Handle("/api/account/register/", handlers.NewRegister(accountService, roleService))
+	serveMux.Handle("/api/account/login/", handlers.NewLogin(accountService))
+	serveMux.Handle("/api/account/user/", handlers.NewUser(accountService))
 
+	addr := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
 	server := &http.Server{
 		Addr:         addr,
 		Handler:      serveMux,
@@ -64,11 +63,11 @@ func main() {
 		}
 	}()
 
-	signalChannel := make(chan os.Signal)
-	signal.Notify(signalChannel, os.Interrupt)
-	signal.Notify(signalChannel, os.Kill)
+	signalCh := make(chan os.Signal)
+	signal.Notify(signalCh, os.Interrupt)
+	signal.Notify(signalCh, os.Kill)
 
-	sig := <-signalChannel
+	sig := <-signalCh
 	log.Println("received terminate, graceful shutdown", sig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
