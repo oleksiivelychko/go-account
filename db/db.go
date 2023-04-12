@@ -14,6 +14,7 @@ import (
 
 func Session(dsn, dbLogPath string) (*gorm.DB, error) {
 	var writerLog io.Writer = os.Stdout
+	var logLevel = logger.Silent
 
 	if dbLogPath != "" {
 		file, err := os.OpenFile(GetLogPath(dbLogPath), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
@@ -22,20 +23,21 @@ func Session(dsn, dbLogPath string) (*gorm.DB, error) {
 		}
 
 		writerLog = io.MultiWriter(file)
+		logLevel = logger.Info
 	}
 
-	return gorm.Open(postgres.Open(dsn), makeConfig(writerLog))
+	return gorm.Open(postgres.Open(dsn), makeConfig(writerLog, logLevel))
 }
 
-func makeConfig(writer io.Writer) *gorm.Config {
+func makeConfig(writer io.Writer, level logger.LogLevel) *gorm.Config {
 	return &gorm.Config{
 		Logger: logger.New(
 			log.New(io.MultiWriter(writer), "\r\n", log.LstdFlags),
 			logger.Config{
-				SlowThreshold:             time.Second,   // slow SQL threshold
-				LogLevel:                  logger.Silent, // log level
-				IgnoreRecordNotFoundError: false,         // do not ignore ErrRecordNotFound error
-				Colorful:                  true,          // enable color
+				SlowThreshold:             time.Second, // slow SQL threshold
+				LogLevel:                  level,       // log level
+				IgnoreRecordNotFoundError: false,       // do not ignore ErrRecordNotFound error
+				Colorful:                  true,        // enable color
 			},
 		),
 	}
