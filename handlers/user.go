@@ -6,6 +6,7 @@ import (
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/requests"
 	"github.com/oleksiivelychko/go-account/services"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -19,6 +20,8 @@ func NewUser(accountService *services.Account) *User {
 }
 
 func (handler *User) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	log.Print("handler User is served")
+
 	accountSerialized := &models.AccountSerialized{
 		AccessToken:    req.Header.Get("Authorization"),
 		ExpirationTime: req.Header.Get("Expires"),

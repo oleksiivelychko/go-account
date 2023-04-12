@@ -5,6 +5,7 @@ import (
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/requests"
 	"github.com/oleksiivelychko/go-account/services"
+	"log"
 	"net/http"
 )
 
@@ -17,6 +18,8 @@ func NewLogin(accountService *services.Account) *Login {
 }
 
 func (handler *Login) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	log.Print("handler Login is served")
+
 	if req.Method != http.MethodPost {
 		resp.WriteHeader(http.StatusMethodNotAllowed)
 		return

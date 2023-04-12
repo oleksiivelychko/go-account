@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/oleksiivelychko/go-account/models"
 	"github.com/oleksiivelychko/go-account/services"
+	"log"
 	"net/http"
 )
 
@@ -17,6 +18,8 @@ func NewRegister(accountService *services.Account, roleService *services.Role) *
 }
 
 func (handler *Register) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	log.Print("handler Register is served")
+
 	if req.Method != http.MethodPost {
 		resp.WriteHeader(http.StatusMethodNotAllowed)
 		return
