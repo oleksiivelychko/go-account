@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/oleksiivelychko/go-account/models"
+	"log"
 	"net/http"
 	"os"
 )
 
 func AccessToken(account *models.AccountSerialized) (*models.AccountSerialized, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/access-token?userID=%d", os.Getenv("APP_JWT_URL"), account.ID))
+	requestURL := fmt.Sprintf("%s/access-token?userID=%d", os.Getenv("APP_JWT_URL"), account.ID)
+	log.Printf("GET request to %s", requestURL)
+
+	resp, err := http.Get(requestURL)
 	if err != nil {
 		return account, err
 	}
