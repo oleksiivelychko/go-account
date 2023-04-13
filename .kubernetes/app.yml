@@ -10,8 +10,8 @@ spec:
   selector:
     app: goaccount
   ports:
-    - port: 8081
-      targetPort: 8081
+    - port: 80
+      targetPort: 80
       nodePort: 30000
       name: http
 
@@ -41,12 +41,12 @@ spec:
           image: local/goaccount:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8081
+            - containerPort: 80
           env:
             - name: HOST
               value: ""
             - name: PORT
-              value: "8081"
+              value: "80"
             - name: DB_HOST
               value: "postgres-svc"
             - name: DB_PORT
