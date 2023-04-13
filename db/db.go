@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -18,7 +19,12 @@ func Session(dsn, dbLogPath string) (*gorm.DB, error) {
 	var logLevel = logger.Silent
 
 	if dbLogPath != "" {
-		file, err := os.OpenFile(GetLogPath(dbLogPath), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
+		path, err := GetLogPath(dbLogPath)
+		if err != nil {
+			return nil, err
+		}
+
+		file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 		if err != nil {
 			return nil, err
 		}
@@ -124,6 +130,17 @@ func PrepareTestDB() (*gorm.DB, error) {
 	return sessionDB, err
 }
 
-func GetLogPath(basePath string) string {
-	return fmt.Sprintf("./%s/gorm_%s.log", basePath, time.Now().UTC().Format("02-01-2006"))
+func GetLogPath(dbLogPath string) (string, error) {
+	absPath, err := filepath.Abs(dbLogPath)
+	if err != nil {
+		return "", err
+	}
+
+	if _, err = os.Stat(absPath); os.IsNotExist(err) {
+		if err = os.Mkdir(absPath, 0755); err != nil {
+			return "", err
+		}
+	}
+
+	return fmt.Sprintf("%s/gorm_%s.log", absPath, time.Now().UTC().Format("02-01-2006")), nil
 }

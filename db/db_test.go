@@ -26,7 +26,12 @@ func TestDB_SessionLog(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err = os.Stat(GetLogPath(dbLogPath)); errors.Is(err, os.ErrNotExist) {
+	path, err := GetLogPath(dbLogPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err = os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		t.Fatal(err)
 	}
 }
