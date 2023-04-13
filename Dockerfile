@@ -10,6 +10,4 @@ COPY ./ ./
 
 RUN go build -o /app/go-account
 
-EXPOSE 8080
-
 CMD ["/app/go-account"]
