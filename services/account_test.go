@@ -228,3 +228,53 @@ func TestServices_FindAllAccountsWithRoles(t *testing.T) {
 		t.Errorf("roles capacity mismatch: %d != 10", cap((*accounts)[0].Roles))
 	}
 }
+
+func TestServices_AccountHasRoles(t *testing.T) {
+	accountService, roleService := makeServices()
+
+	var roles []models.Role
+
+	role, err := roleService.FindOneByNameOrCreate("user")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	roles = append(roles, *role)
+
+	role, err = roleService.FindOneByNameOrCreate("customer")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	roles = append(roles, *role)
+
+	account, err := accountService.Create(&models.Account{
+		Email:    "test1@test.test",
+		Password: "secret",
+		Roles:    roles,
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	has := accountService.HasRoles(account, []string{"user"})
+	if !has {
+		t.Error("user has not role user")
+	}
+
+	has = accountService.HasRoles(account, []string{"customer"})
+	if !has {
+		t.Error("user has not role customer")
+	}
+
+	has = accountService.HasRoles(account, []string{"user", "customer"})
+	if !has {
+		t.Error("user has not roles user,customer")
+	}
+
+	has = accountService.HasRoles(account, []string{"user", "admin"})
+	if has {
+		t.Error("user cannot have roles user,admin")
+	}
+}
