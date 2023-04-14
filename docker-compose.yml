@@ -22,7 +22,7 @@ services:
     image: postgres:15.2-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${TEST_DB_NAME:-account-test}
+      POSTGRES_DB: ${TEST_DB_NAME:-account_test}
       POSTGRES_USER: ${TEST_DB_USERNAME:-test}
       POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:-test}
     volumes:
