@@ -118,6 +118,10 @@ func (service *Account) Auth(email, password string) (*models.AccountSerialized,
 	return service.Serialize(account), err
 }
 
+func (service *Account) HasRoles(account *models.Account, roles []string) bool {
+	return service.repo.HasRoles(account, roles)
+}
+
 func (service *Account) GetRepository() *repositories.Account {
 	return service.repo
 }
