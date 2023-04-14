@@ -112,7 +112,7 @@ func (repo *Account) FindOneByEmail(email string, withRoles bool) (*models.Accou
 	}
 
 	if db.Error != nil && db.Error != gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("account not found: %s", db.Error)
+		return nil, db.Error
 	}
 
 	return modelAccount, db.Error
@@ -148,4 +148,16 @@ func (repo *Account) DeleteRoles(account *models.Account, roles []models.Role) (
 	}
 
 	return repo.FindOneByID(account.ID)
+}
+
+func (repo *Account) HasRoles(account *models.Account, roles []string) bool {
+	var count int64
+
+	if repo.Repo.Debug {
+		count = repo.Repo.DB.Debug().Model(&account).Where("name IN ?", roles).Association("Roles").Count()
+	} else {
+		count = repo.Repo.DB.Model(&account).Where("name IN ?", roles).Association("Roles").Count()
+	}
+
+	return count == int64(len(roles))
 }
