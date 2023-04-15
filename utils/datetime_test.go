@@ -1,4 +1,4 @@
-package datetime
+package utils
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 const sampleDateTime = "2023-03-30 17:02:01"
 
 type TestDateTimeDB struct {
-	DateTime TimeDB `json:"datetime"`
+	DateTime DateTime `json:"datetime"`
 }
 
 func TestUtils_MarshalDateTime(t *testing.T) {
@@ -20,7 +20,7 @@ func TestUtils_MarshalDateTime(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	marshalTo := &TestDateTimeDB{DateTime: TimeDB(parsedTime)}
+	marshalTo := &TestDateTimeDB{DateTime: DateTime(parsedTime)}
 	marshaledJSON, err := json.Marshal(marshalTo)
 	if err != nil {
 		t.Fatal(err)
@@ -56,7 +56,7 @@ func TestUtils_UnmarshalDateTime(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	datetimeDB := &TestDateTimeDB{DateTime: TimeDB(parsedTime)}
+	datetimeDB := &TestDateTimeDB{DateTime: DateTime(parsedTime)}
 	datetime, err := datetimeDB.DateTime.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
