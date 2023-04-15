@@ -1,4 +1,4 @@
-package utils
+package datetime
 
 import (
 	"database/sql/driver"
@@ -7,27 +7,27 @@ import (
 	"time"
 )
 
-type DateTime time.Time
+type TimeDB time.Time
 
 //goland:noinspection GoMixedReceiverTypes
-func (datetime *DateTime) MarshalJSON() ([]byte, error) {
+func (datetime *TimeDB) MarshalJSON() ([]byte, error) {
 	instantDatetime := time.Time(*datetime)
 	return []byte(fmt.Sprintf("\"%v\"", instantDatetime.Format(time.DateTime))), nil
 }
 
 //goland:noinspection GoMixedReceiverTypes
-func (datetime *DateTime) UnmarshalJSON(b []byte) (err error) {
+func (datetime *TimeDB) UnmarshalJSON(b []byte) (err error) {
 	parsedTime, err := time.Parse(time.DateTime, strings.Trim(string(b), "\""))
 	if err != nil {
 		return err
 	}
 
-	*datetime = DateTime(parsedTime)
+	*datetime = TimeDB(parsedTime)
 	return
 }
 
 //goland:noinspection GoMixedReceiverTypes
-func (datetime DateTime) Value() (driver.Value, error) {
+func (datetime TimeDB) Value() (driver.Value, error) {
 	var instantTime time.Time
 	instantDatetime := time.Time(datetime)
 	if instantDatetime.UnixNano() == instantTime.UnixNano() {
@@ -38,9 +38,9 @@ func (datetime DateTime) Value() (driver.Value, error) {
 }
 
 //goland:noinspection GoMixedReceiverTypes
-func (datetime *DateTime) Scan(v interface{}) error {
+func (datetime *TimeDB) Scan(v interface{}) error {
 	if value, ok := v.(time.Time); ok {
-		*datetime = DateTime(value)
+		*datetime = TimeDB(value)
 		return nil
 	}
 
