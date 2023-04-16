@@ -137,7 +137,7 @@ func GetLogPath(dbLogPath string) (string, error) {
 	}
 
 	if _, err = os.Stat(absPath); os.IsNotExist(err) {
-		if err = os.Mkdir(absPath, 0755); err != nil {
+		if err = os.Mkdir(absPath, os.ModePerm); err != nil {
 			return "", err
 		}
 	}
