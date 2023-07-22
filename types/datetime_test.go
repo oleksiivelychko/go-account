@@ -1,4 +1,4 @@
-package utils
+package types
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ type TestDateTimeDB struct {
 	DateTime DateTime `json:"datetime"`
 }
 
-func TestUtils_MarshalDateTime(t *testing.T) {
+func TestTypes_MarshalDateTime(t *testing.T) {
 	parsedTime, err := time.Parse(time.DateTime, sampleDateTime)
 	if err != nil {
 		t.Fatal(err)
@@ -42,7 +42,7 @@ func TestUtils_MarshalDateTime(t *testing.T) {
 	}
 }
 
-func TestUtils_UnmarshalDateTime(t *testing.T) {
+func TestTypes_UnmarshalDateTime(t *testing.T) {
 	unmarshalTo := &TestDateTimeDB{}
 	stringJSON := []byte(fmt.Sprintf(`{"datetime":"%s"}`, sampleDateTime))
 

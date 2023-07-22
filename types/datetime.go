@@ -1,4 +1,4 @@
-package utils
+package types
 
 import (
 	"database/sql/driver"
@@ -44,5 +44,5 @@ func (datetime *DateTime) Scan(v interface{}) error {
 		return nil
 	}
 
-	return fmt.Errorf("unable to assign '%v' from DB to time.Time", v)
+	return fmt.Errorf("unable to assign '%v' from DateTime to time.Time", v)
 }
