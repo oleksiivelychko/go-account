@@ -4,7 +4,7 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:15.2-alpine
+    image: postgres:15.3-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-account}
@@ -19,7 +19,7 @@ services:
 
   postgres-test:
     container_name: postgres_test
-    image: postgres:15.2-alpine
+    image: postgres:15.3-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${TEST_DB_NAME:-account_test}
